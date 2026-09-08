@@ -1,0 +1,13 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { CartPage } from '../../components/Cart';
+import { locales, t } from '../../lib/i18n';
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+const { locale } = Astro.props;
+---
+
+<Layout locale={locale} route="cart" title={t(locale, 'Dein Warenkorb', 'Your bag')}
+  ><div class="section-shell page-content"><CartPage locale={locale} client:load /></div></Layout
+>

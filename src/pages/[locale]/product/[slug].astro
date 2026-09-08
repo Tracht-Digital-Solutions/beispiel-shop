@@ -1,0 +1,44 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ProductDetail from '../../../components/ProductDetail';
+import ProductCard from '../../../components/ProductCard';
+import { products } from '../../../lib/catalog';
+import { locales, path, t } from '../../../lib/i18n';
+export function getStaticPaths() {
+  return locales.flatMap((locale) =>
+    products.map((product) => ({
+      params: { locale, slug: product.slug },
+      props: { locale, product },
+    })),
+  );
+}
+const { locale, product } = Astro.props;
+const related = products.filter((p) => p.look === product.look && p.id !== product.id);
+---
+
+<Layout
+  locale={locale}
+  route={`product/${product.slug}`}
+  title={product.name}
+  description={product.description[locale]}
+  image={product.image}
+  ><div class="section-shell product-page">
+    <nav class="breadcrumb" aria-label={t(locale, 'Seitennavigation', 'Breadcrumb')}>
+      <a href={path(locale)}>{t(locale, 'Start', 'Home')}</a><span>/</span><a
+        href={path(locale, 'shop')}>Shop</a
+      ><span>/</span><span>{product.name}</span>
+    </nav><ProductDetail product={product} locale={locale} client:load />
+  </div><section class="section-shell related-section">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">COMPLETE YOUR UNIFORM</span><h2>
+          {t(locale, 'PASST ZU DIR.', 'GOES WITH YOU.')}
+        </h2>
+      </div><a class="arrow-link" href={path(locale, 'lookbook')}
+        >{t(locale, 'Den Look entdecken', 'Discover the look')} ↗</a
+      >
+    </div><div class="product-grid related-grid">
+      {related.map((p) => <ProductCard product={p} locale={locale} />)}
+    </div>
+  </section></Layout
+>

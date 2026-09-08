@@ -1,0 +1,19 @@
+name: Dev build → dev branch
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: dev-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build.yml
+    with:
+      publish_branch: dev

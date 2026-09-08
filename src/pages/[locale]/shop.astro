@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Catalog from '../../components/Catalog';
+import { locales, t } from '../../lib/i18n';
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+const { locale } = Astro.props;
+---
+
+<Layout locale={locale} route="shop" title={t(locale, 'Die Kollektion', 'The collection')}
+  ><div class="section-shell page-content">
+    <div class="catalog-heading">
+      <div>
+        <span class="eyebrow">DROP 001 / THE EVERYDAY COLLECTION</span><h1>
+          {t(locale, 'DEIN NÄCHSTER', 'YOUR NEXT')}<br /><span class="outline-title"
+            >{t(locale, 'DAILY FAVORITE.', 'DAILY FAVOURITE.')}</span
+          >
+        </h1>
+      </div><p>
+        {
+          t(
+            locale,
+            '16 Essentials. Unendlich viele Möglichkeiten. Finde die Teile, die deinen Rhythmus mitgehen.',
+            '16 essentials. Endless possibilities. Find the pieces that move to your rhythm.',
+          )
+        }
+      </p>
+    </div><Catalog locale={locale} client:load />
+  </div></Layout
+>

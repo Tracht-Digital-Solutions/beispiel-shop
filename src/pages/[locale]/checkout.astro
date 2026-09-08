@@ -1,0 +1,13 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Checkout from '../../components/Checkout';
+import { locales, t } from '../../lib/i18n';
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+const { locale } = Astro.props;
+---
+
+<Layout locale={locale} route="checkout" title={t(locale, 'Demo-Checkout', 'Demo checkout')}
+  ><div class="section-shell page-content"><Checkout locale={locale} client:load /></div></Layout
+>

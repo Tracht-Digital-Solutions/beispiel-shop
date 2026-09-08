@@ -1,0 +1,112 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource/barlow-condensed/600.css';
+import '@fontsource/barlow-condensed/700.css';
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader';
+import { CartDrawer } from '../components/Cart';
+import { path, t } from '../lib/i18n';
+import type { Locale } from '../lib/types';
+interface Props {
+  locale: Locale;
+  title: string;
+  description?: string;
+  route?: string;
+  image?: string;
+}
+const {
+  locale,
+  title,
+  description = t(
+    Astro.props.locale,
+    'Streetwear für deinen eigenen Rhythmus. Entdecke BLOCK/01, die interaktive Shop-Arbeitsprobe von Tracht Digital Solutions.',
+    'Streetwear for your own rhythm. Discover BLOCK/01, an interactive store demo by Tracht Digital Solutions.',
+  ),
+  route = '',
+  image = '/images/hero.webp',
+} = Astro.props;
+const canonical = Astro.site ? new URL(path(locale, route), Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head
+    ><meta charset="UTF-8" /><meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    /><meta name="theme-color" content="#f5f4ef" /><meta
+      name="generator"
+      content={Astro.generator}
+    /><title>{title} — BLOCK/01</title><meta name="description" content={description} /><meta
+      name="robots"
+      content="noindex,follow"
+    /><link rel="icon" type="image/svg+xml" href="/favicon.svg" />{
+      canonical && (
+        <>
+          <>
+            <link rel="canonical" href={canonical} />
+            <link
+              rel="alternate"
+              hreflang="de"
+              href={new URL(path('de', route), Astro.site).href}
+            />
+            <link
+              rel="alternate"
+              hreflang="en"
+              href={new URL(path('en', route), Astro.site).href}
+            />
+          </>
+        </>
+      )
+    }<meta property="og:title" content={`${title} — BLOCK/01`} /><meta
+      property="og:description"
+      content={description}
+    /><meta property="og:type" content="website" /><meta
+      property="og:locale"
+      content={locale === 'de' ? 'de_DE' : 'en_GB'}
+    /><meta
+      property="og:image"
+      content={Astro.site ? new URL(image, Astro.site).href : image}
+    /><meta name="twitter:card" content="summary_large_image" /><slot name="head" /></head
+  ><body
+    ><a class="skip-link" href="#main">{t(locale, 'Zum Inhalt', 'Skip to content')}</a><SiteHeader
+      locale={locale}
+      route={route}
+      client:load
+    /><main id="main"><slot /></main><footer class="site-footer">
+      <div class="footer-top">
+        <div>
+          <a class="footer-wordmark" href={path(locale)}>BLOCK/01</a><p>
+            {t(locale, 'Für deinen eigenen Rhythmus.', 'Made for your own rhythm.')}<br
+            />Independent spirit. Everyday uniform.
+          </p>
+        </div><div class="footer-links">
+          <div>
+            <span class="eyebrow">EXPLORE</span><a href={path(locale, 'shop')}
+              >{t(locale, 'Alle Produkte', 'All products')}</a
+            ><a href={path(locale, 'lookbook')}>Lookbook</a><a href={path(locale, 'about')}
+              >{t(locale, 'Die Marke', 'Our story')}</a
+            >
+          </div><div>
+            <span class="eyebrow">INFORMATION</span><a href={path(locale, 'about') + '#shipping'}
+              >{t(locale, 'Versand & Rückgabe', 'Shipping & returns')}</a
+            ><a href={path(locale, 'about') + '#demo'}
+              >{t(locale, 'Über diese Demo', 'About this demo')}</a
+            ><a href="https://tracht-digital.de/" target="_blank" rel="noreferrer"
+              >Tracht Digital Solutions ↗</a
+            >
+          </div>
+        </div>
+      </div><div class="footer-bottom">
+        <span
+          >© {new Date().getFullYear()} BLOCK/01 — {
+            t(locale, 'Fiktive Demo-Marke', 'Fictional demo brand')
+          }</span
+        ><span
+          >{t(locale, 'Eine Arbeitsprobe von', 'A showcase by')}
+          <a href="https://tracht-digital.de/">TRACHT DIGITAL SOLUTIONS ↗</a></span
+        ><span>{t(locale, 'Keine echten Bestellungen.', 'No real orders.')}</span>
+      </div>
+    </footer><CartDrawer locale={locale} client:load /></body
+  >
+</html>

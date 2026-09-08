@@ -1,0 +1,102 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { products } from '../../lib/catalog';
+import { locales, path, t, money } from '../../lib/i18n';
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+const { locale } = Astro.props;
+const looks = [
+  {
+    title: 'CONCRETE HOURS',
+    de: 'Der erste Kaffee. Die vertraute Straße. Ein Look, der mit dir ankommt.',
+    en: 'First coffee. Familiar streets. A look that arrives with you.',
+  },
+  {
+    title: 'OFF THE CLOCK',
+    de: 'Ein warmer Akzent zwischen kühlem Beton. Mach einen Umweg.',
+    en: 'A warm accent against cold concrete. Take the long way.',
+  },
+  {
+    title: 'IN TRANSIT',
+    de: 'Immer in Bewegung. Leichte Schichten für alles dazwischen.',
+    en: 'Always in motion. Easy layers for everything in between.',
+  },
+  {
+    title: 'SLOW SUNDAY',
+    de: 'Tempo raus. Komfort rein. Dein freier Tag hat seinen eigenen Stil.',
+    en: 'Less pace. More comfort. Your day off has a style of its own.',
+  },
+];
+---
+
+<Layout locale={locale} route="lookbook" title="Lookbook / Drop 001"
+  ><div class="section-shell page-content">
+    <div class="catalog-heading">
+      <div>
+        <span class="eyebrow">THE EVERYDAY COLLECTION / LOOKBOOK 001</span><h1>
+          OUTSIDE<br /><span class="outline-title">THE LINES.</span>
+        </h1>
+      </div><p>
+        {
+          t(
+            locale,
+            'Vier Looks. Keine Regeln. Entdecke, wie unsere Essentials zusammenfinden — und mach etwas Eigenes daraus.',
+            'Four looks. No rules. Discover how our essentials come together — then make them your own.',
+          )
+        }
+      </p>
+    </div>{
+      looks.map((look, i) => (
+        <section class:list={['look-row', i % 2 === 1 && 'reverse']} id={`look-${i + 1}`}>
+          <>
+            <div class="look-image">
+              <>
+                <img
+                  src={`/images/look-${i + 1}.webp`}
+                  srcset={`/images/look-${i + 1}-600.webp 600w, /images/look-${i + 1}.webp 1122w`}
+                  sizes="(max-width:700px) 100vw, 55vw"
+                  width="1000"
+                  height="1250"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  alt={t(locale, `Look ${i + 1}: ${look.de}`, `Look ${i + 1}: ${look.en}`)}
+                />
+                <span>LOOK / 0{i + 1}</span>
+              </>
+            </div>
+            <div class="look-details">
+              <>
+                <span class="eyebrow">BLOCK/01 — LOOK 0{i + 1}</span>
+                <h2>{look.title}</h2>
+                <p>{look[locale]}</p>
+                <div class="look-products">
+                  {products
+                    .filter((p) => p.look === i + 1)
+                    .map((p) => (
+                      <a href={path(locale, `product/${p.slug}`)}>
+                        <img
+                          src={p.image.replace('.webp', '-480.webp')}
+                          width="100"
+                          height="125"
+                          loading="lazy"
+                          alt={p.imageAlt[locale]}
+                        />
+                        <span>
+                          {p.name}
+                          <small>{p.variants[0].colorName[locale]}</small>
+                        </span>
+                        <span>
+                          {money(p.price, locale)}
+                          <small>↗</small>
+                        </span>
+                      </a>
+                    ))}
+                </div>
+              </>
+            </div>
+          </>
+        </section>
+      ))
+    }
+  </div></Layout
+>

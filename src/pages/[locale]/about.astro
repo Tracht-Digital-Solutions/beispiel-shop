@@ -1,0 +1,105 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { locales, path, t } from '../../lib/i18n';
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+const { locale } = Astro.props;
+---
+
+<Layout locale={locale} route="about" title={t(locale, 'Die Marke', 'Our story')}
+  ><section class="about-hero section-shell">
+    <span class="eyebrow">INDEPENDENT BY DESIGN / EST. 2026</span><h1>
+      {t(locale, 'WENIGER LÄRM.', 'LESS NOISE.')}<br /><span class="outline-title"
+        >{t(locale, 'MEHR DU.', 'MORE YOU.')}</span
+      >
+    </h1><p>
+      {
+        t(
+          locale,
+          'BLOCK/01 ist eine Idee von Freiheit im Alltag. Von Kleidung, die Raum lässt. Für Bewegung, für Persönlichkeit, für deinen eigenen Weg.',
+          'BLOCK/01 is an idea of everyday freedom. Of clothing that leaves room. For movement, for personality, for your own way.',
+        )
+      }
+    </p>
+  </section><div class="about-image">
+    <img
+      src="/images/hero.webp"
+      width="1920"
+      height="1080"
+      alt={t(
+        locale,
+        'Die Bildwelt der fiktiven Streetwear-Marke BLOCK/01',
+        'The visual world of fictional streetwear brand BLOCK/01',
+      )}
+      loading="lazy"
+    />
+  </div><section class="section-shell about-columns">
+    <span class="eyebrow">THE BLOCK/01 MINDSET</span><div>
+      <h2>{t(locale, 'GUTE BASICS. EIGENE WEGE.', 'GOOD BASICS. YOUR OWN WAY.')}</h2><p>
+        {
+          t(
+            locale,
+            'Unsere fiktive Kollektion beginnt bei klaren Silhouetten, spürbaren Texturen und Farben, die miteinander funktionieren. Shirts, Hoodies, Hosen und Accessoires bilden eine Garderobe, die sich immer neu kombinieren lässt.',
+            'Our fictional collection starts with clean silhouettes, tangible textures and colours that work together. T-shirts, hoodies, pants and accessories form a wardrobe that can be combined in endless ways.',
+          )
+        }
+      </p><a href={path(locale, 'shop')} class="arrow-link"
+        >{t(locale, 'Finde deine Essentials', 'Find your essentials')} ↗</a
+      >
+    </div>
+  </section><section class="section-shell info-section" id="shipping">
+    <span class="eyebrow">GOOD TO KNOW</span><h2>
+      {t(locale, 'VERSAND & RÜCKGABE', 'SHIPPING & RETURNS')}
+    </h2><div class="info-grid">
+      <div>
+        <h3>{t(locale, 'So funktioniert der Demo-Versand', 'How demo delivery works')}</h3><p>
+          {
+            t(
+              locale,
+              'Wir zeigen einen beispielhaften Versand innerhalb Deutschlands: 4,90 € Versandkosten, ab 100 € Warenwert versandkostenfrei. Die angezeigte Lieferzeit beträgt beispielhaft 2–4 Werktage. Es wird keine Ware versendet.',
+              'We demonstrate delivery within Germany: €4.90 shipping, free on orders of €100 or more. The illustrated delivery time is 2–4 working days. No goods are shipped.',
+            )
+          }
+        </p>
+      </div><div>
+        <h3>{t(locale, 'Rückgabe in dieser Arbeitsprobe', 'Returns in this showcase')}</h3><p>
+          {
+            t(
+              locale,
+              'Alle Artikel und Angebote sind fiktiv. Da keine Kaufverträge entstehen, gibt es keine tatsächlichen Rücksendungen. Du kannst den Warenkorb jederzeit bearbeiten und den Kaufablauf beliebig oft ausprobieren.',
+              'All products and offers are fictional. Since no purchases take place, there are no actual returns. You can edit your bag at any time and try the shopping flow as often as you like.',
+            )
+          }
+        </p>
+      </div>
+    </div>
+  </section><section class="demo-info" id="demo">
+    <div class="section-shell">
+      <span class="eyebrow">DESIGNED & BUILT BY TRACHT DIGITAL SOLUTIONS</span><h2>
+        {t(locale, 'EIN SHOP. VIELE MÖGLICHKEITEN.', 'ONE STORE. MANY POSSIBILITIES.')}
+      </h2><p>
+        {
+          t(
+            locale,
+            'Diese Website ist eine interaktive Arbeitsprobe. BLOCK/01 ist eine fiktive Marke; Bilder wurden mit KI für die Demo erstellt. Du kannst Produkte entdecken, den Warenkorb nutzen und eine Bestellung simulieren. Es werden keine echten Bestellungen, Zahlungen oder E-Mails ausgelöst.',
+            'This website is an interactive showcase. BLOCK/01 is a fictional brand; images were created with AI for this demo. Discover products, use the bag and simulate an order. No real orders, payments or emails are created.',
+          )
+        }
+      </p><p>
+        {
+          t(
+            locale,
+            'Dein Warenkorb wird nur in deinem Browser gespeichert. Adressdaten bleiben während des Checkouts im Arbeitsspeicher und werden nicht an einen Bestellservice gesendet. Schriften und Bilder werden lokal bereitgestellt; der Shop verwendet keine Analyse- oder Marketingdienste. Angaben zum Hosting ergänzt der Betreiber beim Deployment.',
+            'Your bag is saved only in your browser. Address details stay in memory during checkout and are not sent to an ordering service. Fonts and images are served locally; the store uses no analytics or marketing services. Hosting information is to be added by the operator when deploying.',
+          )
+        }
+      </p><a
+        href="https://tracht-digital.de/"
+        class="btn btn-orange"
+        target="_blank"
+        rel="noreferrer">Tracht Digital Solutions ↗</a
+      >
+    </div>
+  </section></Layout
+>

@@ -1,0 +1,125 @@
+name: Build (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      publish_branch:
+        description: Artifact branch (dev or release); empty runs checks only.
+        type: string
+        default: ''
+      deploy:
+        description: Notify the optional deployment webhook after publishing release.
+        type: boolean
+        default: false
+    secrets:
+      DEPLOY_WEBHOOK_URL:
+        description: Optional deployment notification URL, used by manual releases only.
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+    steps:
+      - name: Check publication target
+        env:
+          PUBLISH_BRANCH: ${{ inputs.publish_branch }}
+          DEPLOY: ${{ inputs.deploy }}
+        run: |
+          case "$PUBLISH_BRANCH" in
+            ''|dev|release) ;;
+            *) echo "::error::Unsupported artifact branch."; exit 1 ;;
+          esac
+          if [ -n "$PUBLISH_BRANCH" ] && [ "$GITHUB_REF" != 'refs/heads/main' ]; then
+            echo "::error::Artifact branches can only be built from main."
+            exit 1
+          fi
+          if [ "$DEPLOY" = 'true' ] && [ "$PUBLISH_BRANCH" != 'release' ]; then
+            echo "::error::A deployment notification requires the release branch."
+            exit 1
+          fi
+
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Unit tests
+        run: npm run test:run
+
+      - name: Build static shop
+        run: npm run build
+
+      - name: Stamp build
+        env:
+          BUILD_CHANNEL: ${{ inputs.publish_branch || 'ci' }}
+        run: node scripts/stamp-build.mjs
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: npm run test:e2e
+
+      - name: Upload browser test reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: browser-report-${{ inputs.publish_branch || 'ci' }}-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload static build
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: shop-${{ inputs.publish_branch || 'ci' }}-${{ github.run_id }}
+          path: dist/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish static artifact branch
+        if: ${{ inputs.publish_branch != '' }}
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
+        with:
+          github_token: ${{ github.token }}
+          publish_dir: ./dist
+          publish_branch: ${{ inputs.publish_branch }}
+          force_orphan: true
+          commit_message: '${{ inputs.publish_branch }} ${{ github.sha }}'
+
+      - name: Notify deployment webhook
+        if: ${{ inputs.deploy && inputs.publish_branch == 'release' }}
+        env:
+          DEPLOY_WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_WEBHOOK_URL" ]; then
+            echo "DEPLOY_WEBHOOK_URL is not configured; release is published without a deployment notification."
+            exit 0
+          fi
+          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            -X POST -L --post301 --post302 --post303 \
+            --retry 3 --retry-delay 5 --max-time 30 \
+            "$DEPLOY_WEBHOOK_URL") || status=000
+          if [[ "$status" =~ ^2[0-9]{2}$ ]]; then
+            echo "Deployment webhook notified (HTTP $status)."
+          else
+            echo "::warning title=Deployment notification failed::HTTP $status. The release branch is published; check the host or DEPLOY_WEBHOOK_URL."
+          fi

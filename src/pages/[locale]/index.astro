@@ -1,0 +1,199 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard';
+import { products } from '../../lib/catalog';
+import { locales, path, t } from '../../lib/i18n';
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+const { locale } = Astro.props;
+const featured = ['concrete-hoodie', 'heavy-tee', 'cargo-pant', 'utility-cap'].map((slug) =>
+  products.find((p) => p.slug === slug)!,
+);
+---
+
+<Layout
+  locale={locale}
+  title={t(locale, 'Dein Rhythmus. Deine Regeln.', 'Your rhythm. Your rules.')}
+>
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    href="/images/hero.webp"
+    imagesrcset="/images/hero-960.webp 960w, /images/hero.webp 1536w"
+    imagesizes="100vw"
+  />
+  <section class="hero">
+    <img
+      class="hero-image"
+      src="/images/hero.webp"
+      srcset="/images/hero-960.webp 960w, /images/hero.webp 1536w"
+      sizes="100vw"
+      width="1920"
+      height="1080"
+      alt={t(
+        locale,
+        'Drei Models in urbaner Streetwear vor skulpturaler Betonarchitektur',
+        'Three models in urban streetwear against sculptural concrete architecture',
+      )}
+      fetchpriority="high"
+    /><div class="hero-shade"></div><div class="hero-content">
+      <p class="eyebrow"><span class="orange-dot"></span> DROP 001 / THE EVERYDAY COLLECTION</p><h1>
+        {t(locale, 'DEIN RHYTHMUS.', 'YOUR RHYTHM.')}<br /><span
+          >{t(locale, 'DEINE REGELN.', 'YOUR RULES.')}</span
+        >
+      </h1><p class="hero-description">
+        {
+          t(
+            locale,
+            'Klare Formen. Starke Haltung. Essentials, die deinen Alltag mitmachen.',
+            'Clean shapes. Strong attitude. Essentials that move through life with you.',
+          )
+        }
+      </p><a class="btn btn-orange" href={path(locale, 'shop')}
+        >{t(locale, 'Kollektion entdecken', 'Explore the collection')}<span>↗</span></a
+      >
+    </div><div class="hero-bottom">
+      <span>EST. 2026 — INDEPENDENT BY DESIGN</span><span
+        >{t(locale, 'FÜR ALLE. FÜR JEDEN TAG.', 'FOR EVERYONE. FOR EVERY DAY.')}<span
+          class="hero-cross">+</span
+        ></span
+      >
+    </div><span class="hero-vertical">BLOCK/01 — COLLECTION STUDIES</span>
+  </section>
+  <div class="manifesto-strip">
+    <span>UNISEX ESSENTIALS</span><span class="strip-cross">✳</span><span>BUILT FOR EVERYDAY</span
+    ><span class="strip-cross">✳</span><span>YOUR CITY. YOUR PACE.</span><span class="strip-cross"
+      >✳</span
+    ><span>BLOCK/01</span>
+  </div>
+  <section class="section-shell featured">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">01 / THE DAILY ROTATION</span><h2>
+          {t(locale, 'DEINE NEUEN ESSENTIALS.', 'YOUR NEW ESSENTIALS.')}
+        </h2>
+      </div><a class="arrow-link" href={path(locale, 'shop')}
+        >{t(locale, 'Alles entdecken', 'Discover everything')} <span>↗</span></a
+      >
+    </div><div class="product-grid">
+      {featured.map((p) => <ProductCard product={p} locale={locale} />)}
+    </div>
+  </section>
+  <section class="lookbook-teaser">
+    <a href={path(locale, 'lookbook')} class="lookbook-photo"
+      ><img
+        src="/images/look-2.webp"
+        srcset="/images/look-2-600.webp 600w, /images/look-2.webp 1122w"
+        sizes="(max-width:700px) 100vw,55vw"
+        width="1000"
+        height="1250"
+        loading="lazy"
+        alt={t(
+          locale,
+          'Signalorange trifft auf Washed Denim im urbanen Lookbook',
+          'Signal orange meets washed denim in the urban lookbook',
+        )}
+      /><span class="photo-label">LOOK 02 / OFF THE CLOCK <span>↗</span></span></a
+    ><div class="lookbook-copy">
+      <span class="eyebrow">02 / OUTSIDE THE LINES</span><h2>
+        {t(locale, 'DIE STADT', 'THE CITY')}<br />{t(locale, 'IST DEIN', 'IS YOUR')}<br /><span
+          >{t(locale, 'STUDIO.', 'STUDIO.')}</span
+        >
+      </h2><p>
+        {
+          t(
+            locale,
+            'Kein Dresscode. Kein Drehbuch. Nur du und die Straßen, die du zu deinen machst. Entdecke vier Looks für deinen nächsten Umweg.',
+            'No dress code. No script. Just you and the streets you make your own. Explore four looks for your next detour.',
+          )
+        }
+      </p><a class="btn btn-outline" href={path(locale, 'lookbook')}
+        >{t(locale, 'Zum Lookbook', 'Explore the lookbook')} ↗</a
+      ><span class="lookbook-coordinate">52°31′ N / 13°24′ E<br />EVERYDAY IS A NEW DIRECTION.</span
+      >
+    </div>
+  </section>
+  <section class="section-shell category-section">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">03 / FIND YOUR UNIFORM</span><h2>
+          {t(locale, 'DEIN LOOK. DEIN WEG.', 'YOUR LOOK. YOUR WAY.')}
+        </h2>
+      </div>
+    </div><div class="category-grid">
+      {
+        [
+          { id: 'tees', label: 'T-SHIRTS', image: 'heavy-tee' },
+          { id: 'hoodies', label: 'HOODIES & SWEATS', image: 'signal-hoodie' },
+          { id: 'pants', label: t(locale, 'HOSEN', 'PANTS'), image: 'wide-denim' },
+          {
+            id: 'accessories',
+            label: t(locale, 'ACCESSOIRES', 'ACCESSORIES'),
+            image: 'crossbody-bag',
+          },
+        ].map((cat, i) => (
+          <a href={path(locale, 'shop') + `?category=${cat.id}`} class="category-card">
+            <>
+              <img
+                src={`/images/${cat.image}-480.webp`}
+                width="480"
+                height="600"
+                loading="lazy"
+                alt={cat.label}
+              />
+              <span class="category-number">0{i + 1}</span>
+              <span class="category-title">
+                {cat.label}
+                <span>↗</span>
+              </span>
+            </>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+  <section class="brand-statement">
+    <span class="eyebrow">LESS NOISE. MORE YOU.</span><h2>
+      {t(locale, 'KEIN TREND.', 'NOT A TREND.')}<br />{
+        t(locale, 'DEINE HALTUNG.', 'YOUR ATTITUDE.')
+      }
+    </h2><div>
+      <p>
+        {
+          t(
+            locale,
+            'BLOCK/01 steht für die Freiheit, deinen eigenen Stil zu finden. Gute Basics. Durchdachte Details. Und Platz für das, was dich ausmacht.',
+            'BLOCK/01 stands for the freedom to find your own style. Good basics. Considered details. And room for whatever makes you, you.',
+          )
+        }
+      </p><a class="arrow-link" href={path(locale, 'about')}
+        >{t(locale, 'Das ist BLOCK/01', 'This is BLOCK/01')} ↗</a
+      >
+    </div><span class="statement-star" aria-hidden="true">✳</span>
+  </section>
+  <section class="service-strip">
+    <div>
+      <span>01</span><p>
+        {t(locale, 'Versandfrei ab 100 €', 'Free shipping over €100')}<small
+          >{t(locale, 'Demo-Versand innerhalb Deutschlands', 'Demo delivery within Germany')}</small
+        >
+      </p>
+    </div><div>
+      <span>02</span><p>
+        {t(locale, 'Dein Fit. Dein Gefühl.', 'Your fit. Your feeling.')}<small
+          >{t(locale, 'Größenhilfe bei jedem Produkt', 'Size guide with every product')}</small
+        >
+      </p>
+    </div><div>
+      <span>03</span><p>
+        {t(locale, 'Einfach ausprobieren', 'Give it a try')}<small
+          >{
+            t(locale, 'Vollständiger Kaufablauf als Demo', 'Complete shopping flow in demo mode')
+          }</small
+        >
+      </p>
+    </div>
+  </section>
+</Layout>
