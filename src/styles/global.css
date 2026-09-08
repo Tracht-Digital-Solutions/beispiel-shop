@@ -1522,7 +1522,7 @@ dialog:not([open]) {
     padding: 42px 22px 0;
   }
   .footer-wordmark {
-    font-size: 65px;
+    font-size: clamp(48px, 15vw, 65px);
   }
   .footer-links {
     display: grid;

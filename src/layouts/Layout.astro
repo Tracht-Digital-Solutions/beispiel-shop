@@ -4,6 +4,7 @@ import '@fontsource/barlow-condensed/600.css';
 import '@fontsource/barlow-condensed/700.css';
 import '../styles/global.css';
 import SiteHeader from '../components/SiteHeader';
+import TdsBrandBar from '../components/TdsBrandBar.astro';
 import { CartDrawer } from '../components/Cart';
 import { path, t } from '../lib/i18n';
 import type { Locale } from '../lib/types';
@@ -102,11 +103,8 @@ const canonical = Astro.site ? new URL(path(locale, route), Astro.site).href : u
           >© {new Date().getFullYear()} BLOCK/01 — {
             t(locale, 'Fiktive Demo-Marke', 'Fictional demo brand')
           }</span
-        ><span
-          >{t(locale, 'Eine Arbeitsprobe von', 'A showcase by')}
-          <a href="https://tracht-digital.de/">TRACHT DIGITAL SOLUTIONS ↗</a></span
         ><span>{t(locale, 'Keine echten Bestellungen.', 'No real orders.')}</span>
       </div>
-    </footer><CartDrawer locale={locale} client:load /></body
+    </footer><TdsBrandBar locale={locale} /><CartDrawer locale={locale} client:load /></body
   >
 </html>

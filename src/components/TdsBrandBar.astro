@@ -1,0 +1,208 @@
+---
+import { t } from '../lib/i18n';
+import type { Locale } from '../lib/types';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<aside class="tds-brand-bar" aria-label="Tracht Digital Solutions">
+  <div class="tds-brand-inner">
+    <div class="tds-brand-signature">
+      <span class="tds-brand-kicker">
+        {t(locale, 'Design & digitale Umsetzung', 'Design & development')}
+      </span>
+      <strong>Tracht Digital Solutions</strong>
+      <span class="tds-brand-stripes" aria-hidden="true"><i></i><i></i><i></i></span>
+    </div>
+    <nav
+      class="tds-brand-actions"
+      aria-label={t(locale, 'TDS Website und Kontakt', 'TDS website and contact')}
+    >
+      <a
+        class="tds-brand-button tds-brand-button--website"
+        href="https://tracht-digital.de/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t(
+          locale,
+          'Zur Website von Tracht Digital Solutions (öffnet neuen Tab)',
+          'Visit website of Tracht Digital Solutions (opens a new tab)',
+        )}
+      >
+        {t(locale, 'Zur Website', 'Visit website')}
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M15 3h6v6M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"
+          ></path>
+        </svg>
+      </a>
+      <a
+        class="tds-brand-button tds-brand-button--contact"
+        href="https://tracht-digital.de/#contact"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t(
+          locale,
+          'Zum Kontaktformular von Tracht Digital Solutions (öffnet neuen Tab)',
+          'Contact form of Tracht Digital Solutions (opens a new tab)',
+        )}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2ZM8 8h8M8 12h6"
+          ></path>
+        </svg>
+        {t(locale, 'Zum Kontaktformular', 'Contact form')}
+      </a>
+    </nav>
+  </div>
+</aside>
+
+<style>
+  .tds-brand-bar {
+    --tds-navy: #050f68;
+    --tds-paper: #fafaf7;
+    --tds-pink: #ff7a9c;
+    background:
+      radial-gradient(circle at 88% 18%, rgb(255 122 156 / 16%), transparent 26%),
+      linear-gradient(112deg, var(--tds-navy) 0 72%, #820933 100%);
+    color: var(--tds-paper);
+  }
+  .tds-brand-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 38px;
+    min-height: 132px;
+    padding: 26px 4.15%;
+  }
+  .tds-brand-signature {
+    display: grid;
+    gap: 7px;
+  }
+  .tds-brand-kicker {
+    color: #c5c8e5;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .tds-brand-signature strong {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(20px, 2vw, 25px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .tds-brand-stripes {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .tds-brand-stripes i {
+    width: 42px;
+    height: 4px;
+    background: #a4153f;
+  }
+  .tds-brand-stripes i:nth-child(2) {
+    width: 20px;
+    background: var(--tds-pink);
+  }
+  .tds-brand-stripes i:nth-child(3) {
+    width: 12px;
+    background: #e9b455;
+  }
+  .tds-brand-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .tds-brand-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 12px 18px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    transition: transform 180ms ease;
+  }
+  .tds-brand-button svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+  }
+  .tds-brand-button--website {
+    background: rgb(250 250 247 / 8%);
+  }
+  .tds-brand-button--contact {
+    background: var(--tds-pink);
+    color: var(--tds-navy);
+  }
+  .tds-brand-button:hover,
+  .tds-brand-button:focus-visible {
+    background: var(--tds-paper);
+    color: var(--tds-navy);
+    transform: translateY(-2px);
+  }
+  .tds-brand-button:focus-visible {
+    outline: 2px solid var(--tds-paper);
+    outline-offset: 3px;
+  }
+  @media (max-width: 900px) {
+    .tds-brand-inner {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .tds-brand-actions {
+      justify-content: flex-start;
+    }
+  }
+  @media (max-width: 700px) {
+    .tds-brand-inner {
+      padding: 30px 22px;
+    }
+  }
+  @media (max-width: 560px) {
+    .tds-brand-actions,
+    .tds-brand-button {
+      width: 100%;
+    }
+    .tds-brand-button {
+      min-height: 48px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tds-brand-button {
+      transition: none;
+    }
+    .tds-brand-button:hover,
+    .tds-brand-button:focus-visible {
+      transform: none;
+    }
+  }
+</style>
