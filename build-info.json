@@ -1,0 +1,11 @@
+{
+  "channel": "release",
+  "commit": "0c850e72c80d361a4a3e19fdbccbd95cf7ccbe7a",
+  "shortCommit": "0c850e7",
+  "ref": "refs/heads/main",
+  "builtAt": "2026-09-09T06:04:54.948Z",
+  "runId": "34317468747",
+  "runUrl": "https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions/runs/34317468747",
+  "workflow": "Release → release branch (manual)",
+  "demo": true
+}
