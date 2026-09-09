@@ -91,9 +91,7 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
               <path d="M5 7h14l1 14H4L5 7Z" />
               <path d="M8 8V6a4 4 0 0 1 8 0v2" />
             </svg>
-            <span className="cart-number" key={count}>
-              {String(count).padStart(2, '0')}
-            </span>
+            <span className="cart-number">{String(count).padStart(2, '0')}</span>
           </button>
           <button
             className="mobile-menu-button icon-button"

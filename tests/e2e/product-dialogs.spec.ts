@@ -9,6 +9,8 @@ const viewportsFor = (testInfo: TestInfo) =>
     : [{ width: 1440, height: 900 }];
 
 async function expectCenteredAndContained(dialog: Locator, page: Page) {
+  // Check the final position after the panel has entered from outside the viewport.
+  await expect(dialog).toHaveCSS('transform', 'none');
   const bounds = await dialog.boundingBox();
   const viewport = page.viewportSize();
   expect(bounds).not.toBeNull();

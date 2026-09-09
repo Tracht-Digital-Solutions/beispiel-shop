@@ -190,9 +190,6 @@ dialog:not([open]) {
   font-size: 12px;
   font-weight: 600;
   border: 1px solid var(--ink);
-  transition:
-    background 0.2s,
-    color 0.2s;
 }
 .btn:hover {
   background: #41443b;
@@ -548,10 +545,6 @@ dialog:not([open]) {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.55s ease;
-}
-.product-image-link:hover img {
-  transform: scale(1.045);
 }
 .product-badge {
   position: absolute;
@@ -579,8 +572,6 @@ dialog:not([open]) {
   justify-content: center;
   font-size: 19px;
   opacity: 0;
-  transform: translateY(8px);
-  transition: 0.2s;
 }
 .product-image-link:hover .card-arrow,
 .product-image-link:focus-visible .card-arrow {
@@ -707,10 +698,6 @@ dialog:not([open]) {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s;
-}
-.category-card:hover > img {
-  transform: scale(1.04);
 }
 .category-number {
   position: absolute;

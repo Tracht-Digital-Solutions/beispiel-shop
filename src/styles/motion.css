@@ -1,130 +1,43 @@
-/* Feedback stays brief and never delays closing or moves a dialog's hit area. */
+/* Move the whole panel in from outside the viewport; closing remains immediate. */
 @media (prefers-reduced-motion: no-preference) {
-  dialog[open],
-  dialog[open]::backdrop {
-    animation: block-fade-in 180ms ease-out;
+  .commerce-cart-drawer[open],
+  .menu-dialog[open] {
+    animation: block-slide-from-right 380ms cubic-bezier(0.22, 0.7, 0.25, 1);
   }
 
-  .commerce-cart-drawer[open] .commerce-drawer-shell {
-    animation: block-drawer-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  .filter-dialog[open] {
+    animation: block-slide-from-bottom 380ms cubic-bezier(0.22, 0.7, 0.25, 1);
   }
 
-  .menu-dialog[open] nav,
-  .product-accordions details[open] > p,
-  .commerce-confirmation-mark {
-    animation: block-rise-in 180ms ease-out;
-  }
-
-  .cart-number {
-    animation: block-count-change 240ms ease-out;
-  }
-
-  .commerce-button,
-  .btn,
-  .btn-outline,
-  .product-sizes button,
-  .product-color,
-  .product-thumbnails > button,
-  .commerce-quantity button,
-  .commerce-close,
-  .commerce-dialog-close,
-  .filter-chips button {
-    transition:
-      background-color 150ms ease-out,
-      color 150ms ease-out,
-      border-color 150ms ease-out,
-      transform 120ms ease-out;
-  }
-
-  .commerce-button:not(:disabled):not([aria-disabled='true']):active,
-  .btn:active,
-  .btn-outline:active,
-  .product-sizes button:not(:disabled):active,
-  .product-color:not(:disabled):active,
-  .product-thumbnails > button:not(:disabled):active,
-  .commerce-quantity button:not(:disabled):active {
-    transform: scale(0.98);
-  }
-
-  .arrow-link > span,
-  .commerce-button > span[aria-hidden='true'] {
-    transition: transform 160ms ease-out;
-  }
-
-  .commerce-free-shipping progress::-webkit-progress-value {
-    transition: width 240ms ease-out;
-  }
-
-  .commerce-free-shipping progress::-moz-progress-bar {
-    transition: width 240ms ease-out;
-  }
-
-  .desktop-nav a:not(.current)::after {
-    content: '';
-    position: absolute;
-    bottom: 3px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--orange);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 180ms ease-out;
-  }
-
-  .desktop-nav a:focus-visible::after {
-    transform: scaleX(1);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .desktop-nav a:hover::after {
-      transform: scaleX(1);
-    }
-
-    .arrow-link:hover > span,
-    .commerce-button:not(:disabled):not([aria-disabled='true']):hover > span[aria-hidden='true'] {
-      transform: translate(2px, -2px);
-    }
-
-    .commerce-quantity button:not(:disabled):hover,
-    .commerce-close:hover,
-    .commerce-dialog-close:hover {
-      background-color: #e5e2d9;
-    }
+  .product-zoom-dialog[open],
+  .product-guide-dialog[open] {
+    animation: block-slide-to-center 420ms cubic-bezier(0.22, 0.7, 0.25, 1);
   }
 }
 
-@keyframes block-fade-in {
+@keyframes block-slide-from-right {
   from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes block-drawer-in {
-  from {
-    transform: translateX(18px);
+    transform: translateX(100%);
   }
   to {
     transform: none;
   }
 }
 
-@keyframes block-rise-in {
+@keyframes block-slide-from-bottom {
   from {
-    opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(100%);
   }
   to {
-    opacity: 1;
     transform: none;
   }
 }
 
-@keyframes block-count-change {
-  50% {
-    transform: scale(1.18);
+@keyframes block-slide-to-center {
+  from {
+    transform: translateY(calc(50dvh + 50%));
+  }
+  to {
+    transform: none;
   }
 }
