@@ -12,6 +12,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
   const [size, setSize] = useState('');
   const [imageIndex, setImageIndex] = useState(0);
   const [feedback, setFeedback] = useState('');
+  const [ready, setReady] = useState(false);
   const [activeDialog, setActiveDialog] = useState<'zoom' | 'guide' | null>(null);
   const cart = useStore($cart, { ssr: 'initial' });
   const zoomRef = useRef<HTMLDialogElement>(null);
@@ -36,6 +37,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
 
   useEffect(() => {
     hydrateCart();
+    setReady(true);
   }, []);
   useEffect(() => {
     if (!activeDialog) return;
@@ -77,6 +79,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
         >
           <button
             className="product-gallery-main"
+            disabled={!ready}
             onClick={() => {
               zoomRef.current?.showModal();
               setActiveDialog('zoom');
@@ -103,6 +106,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
             {images.map((image, index) => (
               <button
                 key={image}
+                disabled={!ready}
                 className={index === imageIndex ? 'is-selected' : ''}
                 aria-pressed={index === imageIndex}
                 aria-label={t(locale, `Bild ${index + 1} anzeigen`, `Show image ${index + 1}`)}
@@ -136,6 +140,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
                   <button
                     type="button"
                     key={variant.color}
+                    disabled={!ready}
                     className={`product-color ${color === variant.color ? 'is-selected' : ''}`}
                     aria-pressed={color === variant.color}
                     aria-label={variant.colorName[locale]}
@@ -159,6 +164,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
               <button
                 type="button"
                 className="commerce-text-button product-guide-button"
+                disabled={!ready}
                 onClick={() => {
                   guideRef.current?.showModal();
                   setActiveDialog('guide');
@@ -171,7 +177,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
                   <button
                     type="button"
                     key={variant.id}
-                    disabled={variant.stock === 0}
+                    disabled={!ready || variant.stock === 0}
                     aria-pressed={size === variant.size}
                     aria-label={`${variant.size}${variant.stock === 0 ? t(locale, ' — ausverkauft', ' — sold out') : ''}`}
                     className={size === variant.size ? 'is-selected' : ''}
@@ -203,7 +209,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
             <button
               className="commerce-button product-add"
               type="submit"
-              disabled={!selectedVariant || selectedVariant.stock < 1}
+              disabled={!ready || !selectedVariant || selectedVariant.stock < 1}
               aria-disabled={stockReached || undefined}
             >
               {stockReached

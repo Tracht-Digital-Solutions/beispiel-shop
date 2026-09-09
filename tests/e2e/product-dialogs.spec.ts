@@ -56,6 +56,39 @@ async function expectClosed(dialog: Locator, trigger: Locator, page: Page) {
   await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');
 }
 
+test('product controls become usable only after their interaction code loads', async ({ page }) => {
+  let releaseScript!: () => void;
+  const scriptGate = new Promise<void>((resolve) => {
+    releaseScript = resolve;
+  });
+  await page.route(/\/ProductDetail\.[^/]+\.js$/, async (route) => {
+    await scriptGate;
+    await route.continue();
+  });
+  try {
+    await page.goto('/en/product/heavy-tee/', { waitUntil: 'domcontentloaded' });
+    const zoom = page.getByRole('button', { name: /Enlarge product image/ });
+    const size = page.getByRole('button', { name: 'M', exact: true });
+    const guide = page.getByRole('button', { name: /^Size guide/ });
+    await expect(zoom).toBeDisabled();
+    await expect(size).toBeDisabled();
+    await expect(guide).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Show image 2' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Chalk', exact: true })).toBeDisabled();
+
+    releaseScript();
+    await zoom.click();
+    await expect(page.locator('.product-zoom-dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await size.click();
+    await expect(size).toHaveAttribute('aria-pressed', 'true');
+    await page.getByRole('button', { name: 'Add to bag', exact: true }).click();
+    await expect(page.locator('.commerce-cart-drawer')).toBeVisible();
+  } finally {
+    releaseScript();
+  }
+});
+
 test('product and lifestyle zoom stay centered, fit the viewport and return focus on close', async ({
   page,
 }, testInfo) => {

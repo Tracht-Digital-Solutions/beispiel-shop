@@ -8,12 +8,14 @@ Stand der Funktions- und Browserprüfungen: 9. September 2026. Geprüft wurde de
 | ----------------------------------------- | -------------------------------------------------------------- |
 | Astro / TypeScript                        | 0 Fehler, 0 Warnungen                                          |
 | Vitest                                    | 34 Tests bestanden                                             |
-| Playwright Desktop + Mobil                | 35 Tests bestanden, 1 bewusst übersprungene doppelte Prüfung   |
+| Playwright Desktop + Mobil                | 37 Tests bestanden, 1 bewusst übersprungene doppelte Prüfung   |
 | Statischer Build                          | 46 Seiten erfolgreich erzeugt                                  |
 | Formatprüfung                             | Bestanden                                                      |
 | axe auf den geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
 
 Die 320- und 834-Pixel-Prüfung wird einmal im Desktop-Testprojekt ausgeführt; derselbe Fall ist im mobilen Projekt zur Vermeidung einer doppelten Ausführung übersprungen. Die Browserprüfungen schließen verzögert geladene interaktive Bereiche mit vorhandenem Warenkorb ein und prüfen dabei auf JavaScript- und Hydrationfehler.
+
+Ein zusätzlicher Test hält das Laden der Produktbedienung gezielt an: Bildzoom, Bildwechsel, Farbe, Größe und Größenhilfe bleiben währenddessen deaktiviert. Nach dem Laden funktionieren Bildzoom und Größenauswahl unmittelbar; ein früher Klick kann nicht mehr vor dem Aktivieren der Bedienung verloren gehen.
 
 ## Funktionsumfang der Prüfung
 
