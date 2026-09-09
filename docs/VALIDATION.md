@@ -37,6 +37,8 @@ Die vergrößerten Produkt- und Lookbookbilder sowie die Größentabelle werden 
 
 Bei aktivierter Einstellung für reduzierte Bewegung werden weiches Scrollen und Bildbewegungen deaktiviert. Diese Einstellung wurde auf Desktop und Mobilgerät nachgestellt. Automatische Prüfungen und diese Bedienkontrollen sind keine vollständige WCAG-Konformitätszertifizierung; eine Prüfung mit realen assistiven Technologien bleibt eine separate Abnahme.
 
+Die ergänzten Bedienanimationen dauern 120–240 ms: Dialoge und Hintergrund blenden ein, der Inhalt des Warenkorbpanels schiebt sich leicht ein, Auswahlbuttons geben eine kurze Druckrückmeldung und der Warenkorbzähler reagiert auf Änderungen. Alle neuen Effekte sind auf `prefers-reduced-motion: no-preference` beschränkt. Dialogpositionen und sofortiges Schließen bleiben erhalten. Die sechs Produktbedienungs- und Dialogtests wurden zusätzlich mit `reducedMotion: 'reduce'` auf Desktop und Mobil erfolgreich ausgeführt.
+
 ## Reproduzierbare Labormessung
 
 Die Rohberichte liegen unter [performance/home.json](performance/home.json), [performance/product.json](performance/product.json) und [performance/summary.json](performance/summary.json). Die Messung verwendet Lighthouse 13.4.1 mit seinem mobilen Standardprofil: 412 × 823 Pixel, simuliertes Netz mit 150 ms RTT und 1.638,4 kbit/s sowie vierfach verlangsamter CPU.

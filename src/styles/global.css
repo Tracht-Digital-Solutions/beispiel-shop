@@ -368,6 +368,8 @@ dialog:not([open]) {
 .cart-number {
   font-size: 10px;
   font-weight: 600;
+  min-width: 2ch;
+  font-variant-numeric: tabular-nums;
 }
 .mobile-menu-button {
   display: none;

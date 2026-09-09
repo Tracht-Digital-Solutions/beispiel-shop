@@ -5,6 +5,7 @@ import { path, t } from '../lib/i18n';
 import type { Locale } from '../lib/types';
 export default function SiteHeader({ locale, route = '' }: { locale: Locale; route?: string }) {
   const items = useStore($cart, { ssr: 'initial' });
+  const count = cartTotals(items).count;
   const mobile = useRef<HTMLDialogElement>(null);
   useEffect(hydrateCart, []);
   const other = locale === 'de' ? 'en' : 'de';
@@ -76,7 +77,7 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
               hydrateCart();
               $cartOpen.set(true);
             }}
-            aria-label={`${t(locale, 'Warenkorb öffnen', 'Open bag')}, ${String(cartTotals(items).count).padStart(2, '0')}`}
+            aria-label={`${t(locale, 'Warenkorb öffnen', 'Open bag')}, ${String(count).padStart(2, '0')}`}
           >
             <svg
               width="21"
@@ -90,7 +91,9 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
               <path d="M5 7h14l1 14H4L5 7Z" />
               <path d="M8 8V6a4 4 0 0 1 8 0v2" />
             </svg>
-            <span className="cart-number">{String(cartTotals(items).count).padStart(2, '0')}</span>
+            <span className="cart-number" key={count}>
+              {String(count).padStart(2, '0')}
+            </span>
           </button>
           <button
             className="mobile-menu-button icon-button"
