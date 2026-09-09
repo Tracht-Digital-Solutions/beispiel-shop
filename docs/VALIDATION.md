@@ -1,6 +1,6 @@
 # Prüfung und Abnahme
 
-Stand: 8. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
+Stand der Funktions- und Browserprüfungen: 9. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Screenshots und Performance-Messungen stammen vom 8. September 2026. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
 
 ## Ergebnis
 
@@ -8,7 +8,7 @@ Stand: 8. September 2026. Geprüft wurde der statische Produktionsbuild, lokal u
 | ----------------------------------------- | -------------------------------------------------------------- |
 | Astro / TypeScript                        | 0 Fehler, 0 Warnungen                                          |
 | Vitest                                    | 34 Tests bestanden                                             |
-| Playwright Desktop + Mobil                | 31 Tests bestanden, 1 bewusst übersprungene doppelte Prüfung   |
+| Playwright Desktop + Mobil                | 35 Tests bestanden, 1 bewusst übersprungene doppelte Prüfung   |
 | Statischer Build                          | 46 Seiten erfolgreich erzeugt                                  |
 | Formatprüfung                             | Bestanden                                                      |
 | axe auf den geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
@@ -30,6 +30,8 @@ Die 320- und 834-Pixel-Prüfung wird einmal im Desktop-Testprojekt ausgeführt; 
 Desktop mit 1440 Pixeln Breite, Pixel-7-Emulation, Tablet mit 834 Pixeln und kleines Smartphone mit 320 Pixeln wurden geprüft. Repräsentative Seiten zeigen keinen horizontalen Überlauf. Die [Desktopansicht](screenshots/desktop.png), [Mobilansicht](screenshots/mobile.png), [Tabletansicht](screenshots/tablet.png) und [Produktseite](screenshots/product.png) wurden visuell kontrolliert. Vollständige Seitenaufnahmen liegen im selben Verzeichnis.
 
 Die automatisierten axe-Prüfungen decken Startseite, Katalog, Produktseite, Lookbook, Warenkorb-Dialog, Adresse, Bestellprüfung sowie mobile Navigation und Filter ab. Tastaturprüfungen umfassen Escape, Fokusrückgabe und den Warenkorb am maximalen Bestand. Tab und Umschalt+Tab erreichen bei geöffnetem Warenkorb keine Hintergrund-Bedienelemente. Sichtbare Fokusrahmen bleiben erhalten.
+
+Die vergrößerten Produkt- und Lookbookbilder sowie die Größentabelle werden zusätzlich bei 1440 × 900, 320 × 568 und 667 × 375 Pixeln geprüft. Die Dialoge bleiben zentriert und innerhalb des sichtbaren Bereichs, Bilder behalten ihr Seitenverhältnis. Escape, Schließen-Button und Hintergrundklick schließen mit Fokusrückgabe; Klicks auf freien Innenabstand der Größentabelle lassen sie geöffnet. Die Zentrierung bleibt nach Scrollen erhalten. Die deutsche Bildansicht wurde am 9. September in diesen drei Formaten zusätzlich visuell kontrolliert.
 
 Bei aktivierter Einstellung für reduzierte Bewegung werden weiches Scrollen und Bildbewegungen deaktiviert. Diese Einstellung wurde auf Desktop und Mobilgerät nachgestellt. Automatische Prüfungen und diese Bedienkontrollen sind keine vollständige WCAG-Konformitätszertifizierung; eine Prüfung mit realen assistiven Technologien bleibt eine separate Abnahme.
 

@@ -126,6 +126,8 @@ small {
   font-size: 12px;
 }
 dialog {
+  /* Restore native dialog centering after Tailwind's universal margin reset. */
+  margin: auto;
   border: 0;
   background: var(--paper);
   color: var(--ink);

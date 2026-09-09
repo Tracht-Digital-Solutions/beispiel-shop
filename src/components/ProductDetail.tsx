@@ -54,6 +54,20 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
     $cartOpen.set(true);
   }
 
+  function closeOnBackdrop(event: React.MouseEvent<HTMLDialogElement>) {
+    if (event.target !== event.currentTarget) return;
+    const dialog = event.currentTarget;
+    const bounds = dialog.getBoundingClientRect();
+    if (
+      event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom
+    ) {
+      dialog.close();
+    }
+  }
+
   return (
     <div className="commerce product-detail">
       <div className="product-detail-grid">
@@ -257,9 +271,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
         className="commerce-dialog product-zoom-dialog"
         aria-label={t(locale, 'Vergrößertes Produktbild', 'Enlarged product image')}
         onClose={() => setActiveDialog(null)}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) zoomRef.current?.close();
-        }}
+        onClick={closeOnBackdrop}
       >
         <button
           className="commerce-dialog-close"
@@ -277,9 +289,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
         className="commerce-dialog product-guide-dialog"
         aria-labelledby={`${uid}-guide`}
         onClose={() => setActiveDialog(null)}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) guideRef.current?.close();
-        }}
+        onClick={closeOnBackdrop}
       >
         <button
           className="commerce-dialog-close"
