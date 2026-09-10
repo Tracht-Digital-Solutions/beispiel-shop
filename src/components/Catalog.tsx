@@ -1,13 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { products } from '../lib/catalog';
 import { categoryNames, t, money } from '../lib/i18n';
 import { defaultFilters, filtersFromSearch, filterProducts, type Filters } from '../lib/filter';
 import type { Locale, Category } from '../lib/types';
-import ProductCard from './ProductCard';
+import CatalogResults from './CatalogResults';
 export default function Catalog({ locale }: { locale: Locale }) {
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [ready, setReady] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
+  const search = useRef<HTMLInputElement>(null);
   useEffect(() => {
     setFilters(filtersFromSearch(location.search));
     setReady(true);
@@ -28,7 +29,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
     setFilters(defaultFilters);
     history.replaceState(null, '', location.pathname);
   }
-  const results = filterProducts(products, filters, locale);
+  const results = useMemo(() => filterProducts(products, filters, locale), [filters, locale]);
   const colors = Array.from(
     new Map(products.flatMap((p) => p.variants.map((v) => [v.color, v] as const))).values(),
   );
@@ -88,6 +89,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
       <div className="category-tabs">
         <button
           className={!filters.category ? 'active' : ''}
+          aria-pressed={!filters.category}
           onClick={() => update('category', '')}
         >
           {t(locale, 'Alles', 'All')} <span>16</span>
@@ -96,6 +98,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
           <button
             key={key}
             className={filters.category === key ? 'active' : ''}
+            aria-pressed={filters.category === key}
             onClick={() => update('category', key)}
           >
             {name[locale]} <span>04</span>
@@ -118,6 +121,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
             <path d="m16 16 5 5" />
           </svg>
           <input
+            ref={search}
             type="search"
             placeholder={t(locale, 'Finde dein nächstes Essential', 'Find your next essential')}
             value={filters.q}
@@ -177,28 +181,14 @@ export default function Catalog({ locale }: { locale: Locale }) {
           )}
         </div>
       </div>
-      {results.length ? (
-        <div className="product-grid">
-          {results.map((p, i) => (
-            <ProductCard key={p.id} product={p} locale={locale} priority={i < 4} />
-          ))}
-        </div>
-      ) : (
-        <div className="empty-state">
-          <span className="eyebrow">NO MATCH / 00</span>
-          <h2>{t(locale, 'Noch nicht dein Match.', 'No match. Yet.')}</h2>
-          <p>
-            {t(
-              locale,
-              'Probiere einen anderen Suchbegriff oder entferne einen Filter.',
-              'Try a different search or remove a filter.',
-            )}
-          </p>
-          <button className="btn" onClick={reset}>
-            {t(locale, 'Alle Produkte zeigen', 'View all products')} ↗
-          </button>
-        </div>
-      )}
+      <CatalogResults
+        products={results}
+        category={filters.category}
+        locale={locale}
+        ready={ready}
+        onReset={reset}
+        searchRef={search}
+      />
       <dialog
         className="filter-dialog"
         ref={dialog}

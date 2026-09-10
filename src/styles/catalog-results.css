@@ -1,0 +1,11 @@
+.catalog-results,
+.catalog-result-card {
+  min-width: 0;
+  /* Clip full-width swipes while leaving room for keyboard focus outlines. */
+  overflow: clip;
+  overflow-clip-margin: 5px;
+}
+
+.catalog-results[data-phase='exit'] {
+  pointer-events: none;
+}
