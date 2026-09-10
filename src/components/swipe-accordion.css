@@ -1,0 +1,20 @@
+.product-accordions details.swipe-accordion {
+  padding-bottom: 0;
+}
+
+.swipe-accordion-viewport {
+  overflow: clip;
+}
+
+.swipe-accordion-content {
+  display: flow-root;
+  padding-bottom: 18px;
+}
+
+.product-accordions .swipe-accordion summary[aria-expanded='false'] > span {
+  transform: none;
+}
+
+.product-accordions .swipe-accordion summary[aria-expanded='true'] > span {
+  transform: rotate(45deg);
+}

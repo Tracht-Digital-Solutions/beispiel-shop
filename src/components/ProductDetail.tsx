@@ -5,35 +5,24 @@ import { money, t } from '../lib/i18n';
 import { $cart, $cartOpen, addItem, hydrateCart } from '../lib/cart';
 import { freeShippingThreshold, shippingCost } from '../lib/config';
 import './commerce.css';
+import ProductGallery from './ProductGallery';
+import SwipeAccordion from './SwipeAccordion';
 
 export function ProductDetail({ locale, product }: { locale: Locale; product: Product }) {
   const colors = [...new Map(product.variants.map((variant) => [variant.color, variant])).values()];
   const [color, setColor] = useState(colors[0]?.color ?? '');
   const [size, setSize] = useState('');
-  const [imageIndex, setImageIndex] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [ready, setReady] = useState(false);
-  const [activeDialog, setActiveDialog] = useState<'zoom' | 'guide' | null>(null);
+  const [activeDialog, setActiveDialog] = useState<'guide' | null>(null);
   const cart = useStore($cart, { ssr: 'initial' });
-  const zoomRef = useRef<HTMLDialogElement>(null);
   const guideRef = useRef<HTMLDialogElement>(null);
   const uid = useId();
-  const images = [product.image, product.lifestyle].filter(
-    (image, index, all) => all.indexOf(image) === index,
-  );
   const variants = product.variants.filter((variant) => variant.color === color);
   const selectedVariant = variants.find((variant) => variant.size === size);
   const selectedColor = colors.find((variant) => variant.color === color);
   const alreadyInCart = cart.find((item) => item.variantId === selectedVariant?.id)?.quantity ?? 0;
   const stockReached = !!selectedVariant && alreadyInCart >= selectedVariant.stock;
-  const imageAlt =
-    imageIndex === 0
-      ? product.imageAlt[locale]
-      : t(
-          locale,
-          `${product.name} im BLOCK/01 Lookbook`,
-          `${product.name} in the BLOCK/01 lookbook`,
-        );
 
   useEffect(() => {
     hydrateCart();
@@ -73,53 +62,7 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
   return (
     <div className="commerce product-detail">
       <div className="product-detail-grid">
-        <section
-          className="product-gallery"
-          aria-label={t(locale, 'Produktbilder', 'Product images')}
-        >
-          <button
-            className="product-gallery-main"
-            disabled={!ready}
-            onClick={() => {
-              zoomRef.current?.showModal();
-              setActiveDialog('zoom');
-            }}
-            aria-label={t(
-              locale,
-              'Details ansehen: Produktbild vergrößern',
-              'Explore the details: Enlarge product image',
-            )}
-          >
-            <img
-              src={images[imageIndex]}
-              alt={imageAlt}
-              fetchPriority="high"
-              width="900"
-              height="1125"
-            />
-            <span className="product-zoom-label">
-              <span aria-hidden="true">↗</span>{' '}
-              {t(locale, 'Details ansehen', 'Explore the details')}
-            </span>
-          </button>
-          <div className="product-thumbnails">
-            {images.map((image, index) => (
-              <button
-                key={image}
-                disabled={!ready}
-                className={index === imageIndex ? 'is-selected' : ''}
-                aria-pressed={index === imageIndex}
-                aria-label={t(locale, `Bild ${index + 1} anzeigen`, `Show image ${index + 1}`)}
-                onClick={() => setImageIndex(index)}
-              >
-                <img src={image} alt="" width="90" height="112" loading="lazy" />
-              </button>
-            ))}
-            <span>
-              {String(imageIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
-            </span>
-          </div>
-        </section>
+        <ProductGallery product={product} locale={locale} ready={ready} />
         <section className="product-purchase" aria-labelledby={`${uid}-title`}>
           <p className="commerce-eyebrow">
             BLOCK/01 — {t(locale, 'Kollektion 2026', 'Collection 2026')}
@@ -241,26 +184,14 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
             </p>
           </div>
           <div className="product-accordions">
-            <details open>
-              <summary>
-                {t(locale, 'Schnitt & Material', 'Fit & fabric')}
-                <span aria-hidden="true">+</span>
-              </summary>
+            <SwipeAccordion title={t(locale, 'Schnitt & Material', 'Fit & fabric')} defaultOpen>
               <p>{product.fit[locale]}</p>
               <p>{product.material[locale]}</p>
-            </details>
-            <details>
-              <summary>
-                {t(locale, 'Pflegehinweise', 'Care instructions')}
-                <span aria-hidden="true">+</span>
-              </summary>
+            </SwipeAccordion>
+            <SwipeAccordion title={t(locale, 'Pflegehinweise', 'Care instructions')}>
               <p>{product.care[locale]}</p>
-            </details>
-            <details>
-              <summary>
-                {t(locale, 'Über diesen Demo-Shop', 'About this demo shop')}
-                <span aria-hidden="true">+</span>
-              </summary>
+            </SwipeAccordion>
+            <SwipeAccordion title={t(locale, 'Über diesen Demo-Shop', 'About this demo shop')}>
               <p>
                 {t(
                   locale,
@@ -268,28 +199,10 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
                   'BLOCK/01 is a fictional brand. All products, prices and stock are part of a portfolio demonstration. No real orders, payments or deliveries are made.',
                 )}
               </p>
-            </details>
+            </SwipeAccordion>
           </div>
         </section>
       </div>
-      <dialog
-        ref={zoomRef}
-        className="commerce-dialog product-zoom-dialog"
-        aria-label={t(locale, 'Vergrößertes Produktbild', 'Enlarged product image')}
-        onClose={() => setActiveDialog(null)}
-        onClick={closeOnBackdrop}
-      >
-        <button
-          className="commerce-dialog-close"
-          type="button"
-          onClick={() => zoomRef.current?.close()}
-          aria-label={t(locale, 'Bild schließen', 'Close image')}
-          autoFocus
-        >
-          ×
-        </button>
-        <img src={images[imageIndex]} alt={imageAlt} />
-      </dialog>
       <dialog
         ref={guideRef}
         className="commerce-dialog product-guide-dialog"

@@ -553,6 +553,11 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow: clip;
+  overflow-clip-margin: 3px;
+}
+.commerce-cart-grid:has(.commerce-cart-items:empty) {
+  grid-template-columns: minmax(0, 1fr);
 }
 .commerce-cart-item {
   display: flex;

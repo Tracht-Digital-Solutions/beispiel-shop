@@ -1,4 +1,4 @@
-/* Move the whole panel in from outside the viewport; closing remains immediate. */
+/* Whole panels enter from outside the viewport. Cart exit is coordinated with native close. */
 @media (prefers-reduced-motion: no-preference) {
   .commerce-cart-drawer[open],
   .menu-dialog[open] {

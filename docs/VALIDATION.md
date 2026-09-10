@@ -1,6 +1,6 @@
 # Prüfung und Abnahme
 
-Stand der Funktions- und Browserprüfungen: 9. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Screenshots und Performance-Messungen stammen vom 8. September 2026. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
+Stand der Funktions- und Browserprüfungen: 10. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Screenshots und Performance-Messungen stammen vom 8. September 2026. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
 
 ## Ergebnis
 
@@ -8,12 +8,12 @@ Stand der Funktions- und Browserprüfungen: 9. September 2026. Geprüft wurde de
 | ----------------------------------------- | -------------------------------------------------------------- |
 | Astro / TypeScript                        | 0 Fehler, 0 Warnungen                                          |
 | Vitest                                    | 34 Tests bestanden                                             |
-| Playwright Desktop + Mobil                | 37 Tests bestanden, 1 bewusst übersprungene doppelte Prüfung   |
+| Playwright Desktop + Mobil                | 48 Tests bestanden, 2 bewusst übersprungene Prüfungen          |
 | Statischer Build                          | 46 Seiten erfolgreich erzeugt                                  |
 | Formatprüfung                             | Bestanden                                                      |
 | axe auf den geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
 
-Die 320- und 834-Pixel-Prüfung wird einmal im Desktop-Testprojekt ausgeführt; derselbe Fall ist im mobilen Projekt zur Vermeidung einer doppelten Ausführung übersprungen. Die Browserprüfungen schließen verzögert geladene interaktive Bereiche mit vorhandenem Warenkorb ein und prüfen dabei auf JavaScript- und Hydrationfehler.
+Die 320- und 834-Pixel-Prüfung wird einmal im Desktop-Testprojekt ausgeführt; derselbe Fall ist im mobilen Projekt zur Vermeidung einer doppelten Ausführung übersprungen. Der Touchgesten-Test läuft ausschließlich im mobilen Projekt. Die Gesten werden in Chromium mit Touch-Eingaben nachgestellt; dies ersetzt keinen Test auf einem physischen Smartphone. Die Browserprüfungen schließen verzögert geladene interaktive Bereiche mit vorhandenem Warenkorb ein und prüfen dabei auf JavaScript- und Hydrationfehler.
 
 Ein zusätzlicher Test hält das Laden der Produktbedienung gezielt an: Bildzoom, Bildwechsel, Farbe, Größe und Größenhilfe bleiben währenddessen deaktiviert. Nach dem Laden funktionieren Bildzoom und Größenauswahl unmittelbar; ein früher Klick kann nicht mehr vor dem Aktivieren der Bedienung verloren gehen.
 
@@ -37,7 +37,11 @@ Die vergrößerten Produkt- und Lookbookbilder sowie die Größentabelle werden 
 
 Bei aktivierter Einstellung für reduzierte Bewegung werden weiches Scrollen und Bildbewegungen deaktiviert. Diese Einstellung wurde auf Desktop und Mobilgerät nachgestellt. Automatische Prüfungen und diese Bedienkontrollen sind keine vollständige WCAG-Konformitätszertifizierung; eine Prüfung mit realen assistiven Technologien bleibt eine separate Abnahme.
 
-Die Bedienanimationen verwenden ausschließlich Einschieben: Warenkorb und mobiles Menü fahren vollständig vom rechten Bildschirmrand herein (380 ms). Der Produktfilter fährt von unten herein (380 ms); Bildansicht und Größenhilfe bewegen sich von unterhalb des Bildschirms in ihre zentrierte Position (420 ms). Die Deckkraft bleibt unverändert. Einblendungen, Buttonbewegungen, Zählerimpulse und animierte Hover-Effekte sind entfernt. Alle Einschubanimationen sind auf `prefers-reduced-motion: no-preference` beschränkt; Schließen bleibt sofort möglich. Die sechs Produktbedienungs- und Dialogtests wurden zusätzlich mit `reducedMotion: 'reduce'` auf Desktop und Mobil erfolgreich ausgeführt.
+Die Bedienanimationen verwenden ausschließlich Schiebebewegungen ohne Einblenden oder Zähler- und Buttonimpulse. Warenkorb und mobiles Menü fahren vollständig vom rechten Bildschirmrand herein (380 ms). Der Warenkorb schiebt sich beim Schließen wieder hinaus; Inhalt, Scrollsperre und Dialogfokus bleiben bis zum Abschluss erhalten. Artikel fahren hinein (360 ms) und hinaus (280 ms). Entfernen aktualisiert den gespeicherten Warenkorb sofort; nur die sichtbare Zeile bleibt für die Ausgangsbewegung bestehen. Erneutes Hinzufügen kann eine laufende Ausgangsbewegung abbrechen, ohne den neuen Artikel zu verlieren.
+
+Produktbilder wechseln mit einem vollständigen horizontalen Swipe (360 ms), über Vorschaubilder, Pfeiltasten und Touchgesten. Eine Mauslupe vergrößert den Bereich unter dem Zeiger um den Faktor 2,5. In der Vollbildansicht lässt sich die Vergrößerung per Button oder Tippen aktivieren und per Ziehen oder Pfeiltasten verschieben. Hover-Pfeile und Mauslupe schieben sich herein (280 ms); die Pfeile bleiben auf Touchgeräten sichtbar. Akkordeons schieben ihren Inhalt beim Öffnen und Schließen vertikal und passen die Höhe an (340 ms). Schnelle Richtungswechsel bleiben bedienbar.
+
+Der Produktfilter fährt von unten herein (380 ms); Bildansicht und Größenhilfe bewegen sich von unterhalb des Bildschirms in ihre zentrierte Position (420 ms). Bei `prefers-reduced-motion: reduce` erfolgen die Zustandswechsel unmittelbar. Automatisierte Prüfungen decken die Bewegungen einschließlich Fokus, letzten Warenkorbartikel, schnelle Bild- und Akkordeonwechsel, Mauslupe, Touchgesten und reduzierte Bewegung ab.
 
 ## Reproduzierbare Labormessung
 

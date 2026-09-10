@@ -1,11 +1,10 @@
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { useStore } from '@nanostores/react';
 import type { Locale } from '../lib/types';
 import {
   $cart,
   $cartNotice,
   $cartOpen,
-  cartEntries,
   cartTotals,
   hydrateCart,
   removeItem,
@@ -13,6 +12,7 @@ import {
 } from '../lib/cart';
 import { freeShippingThreshold } from '../lib/config';
 import { money, path, t } from '../lib/i18n';
+import { slide, useCartRows, type CartRow } from './cart-motion';
 import './commerce.css';
 
 export function StorageNotice({ locale }: { locale: Locale }) {
@@ -34,85 +34,174 @@ export function StorageNotice({ locale }: { locale: Locale }) {
   ) : null;
 }
 
-function CartItems({ locale }: { locale: Locale }) {
-  const items = useStore($cart, { ssr: 'initial' });
-  const uid = useId();
+function AnimatedCartRow({
+  row,
+  finish,
+  children,
+}: {
+  row: CartRow;
+  finish: (id: string, version: number) => void;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLLIElement>(null);
+  const interruptedTransform = useRef<string | null>(null);
+  const { phase, version, variant } = row;
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element || phase === 'idle') {
+      interruptedTransform.current = null;
+      return;
+    }
+    const from = interruptedTransform.current ?? (phase === 'enter' ? 'translateX(-110%)' : 'none');
+    interruptedTransform.current = null;
+    let completed = false;
+    const cancel = slide(
+      element,
+      from,
+      phase === 'exit' ? 'translateX(110%)' : 'none',
+      phase === 'exit' ? 280 : 360,
+      () => {
+        completed = true;
+        finish(variant.id, version);
+      },
+    );
+    return () => {
+      if (!completed) interruptedTransform.current = getComputedStyle(element).transform;
+      cancel?.();
+    };
+  }, [phase, version, variant.id, finish]);
   return (
-    <ul className="commerce-cart-items">
-      {cartEntries(items).map(({ product, variant, quantity }) => (
-        <li key={variant.id} className="commerce-cart-item">
-          <a className="commerce-cart-image" href={path(locale, `product/${product.slug}`)}>
-            <img src={product.image} alt={product.imageAlt[locale]} width="160" height="200" />
-          </a>
-          <div className="commerce-cart-item-info">
-            <div className="commerce-cart-item-top">
-              <a href={path(locale, `product/${product.slug}`)}>{product.name}</a>
-              <span>{money(product.price * quantity, locale)}</span>
-            </div>
-            <p>
-              {variant.colorName[locale]} / {variant.size}
-            </p>
-            <div className="commerce-cart-item-bottom">
-              <div className="commerce-quantity">
-                <button
-                  type="button"
-                  disabled={quantity <= 1}
-                  aria-label={t(
-                    locale,
-                    `Menge von ${product.name} verringern`,
-                    `Decrease quantity of ${product.name}`,
-                  )}
-                  onClick={() => setQuantity(variant.id, quantity - 1)}
-                >
-                  −
-                </button>
-                <label className="commerce-sr-only" htmlFor={`${uid}-${variant.id}`}>
-                  {t(locale, `Menge für ${product.name}`, `Quantity for ${product.name}`)}
-                </label>
-                <input
-                  id={`${uid}-${variant.id}`}
-                  type="number"
-                  min="1"
-                  max={variant.stock}
-                  value={quantity}
-                  inputMode="numeric"
-                  onChange={(event) => {
-                    const value = Number(event.target.value);
-                    if (Number.isFinite(value) && value >= 1)
-                      setQuantity(variant.id, Math.min(variant.stock, Math.floor(value)));
-                  }}
-                />
-                <button
-                  type="button"
-                  disabled={quantity >= variant.stock}
-                  aria-label={t(
-                    locale,
-                    `Menge von ${product.name} erhöhen`,
-                    `Increase quantity of ${product.name}`,
-                  )}
-                  onClick={() => setQuantity(variant.id, quantity + 1)}
-                >
-                  +
-                </button>
+    <li
+      ref={ref}
+      className="commerce-cart-item"
+      data-state={phase}
+      data-variant-id={variant.id}
+      inert={phase === 'exit'}
+      aria-hidden={phase === 'exit' || undefined}
+    >
+      {children}
+    </li>
+  );
+}
+
+function CartItems({ locale, close }: { locale: Locale; close?: () => void }) {
+  const { rows, finish } = useCartRows();
+  const listRef = useRef<HTMLUListElement>(null);
+  const emptyRef = useRef<HTMLDivElement>(null);
+  const uid = useId();
+  useEffect(() => {
+    if (!rows.length && document.activeElement === listRef.current) {
+      emptyRef.current?.querySelector('a')?.focus();
+    }
+  }, [rows.length]);
+  function remove(id: string) {
+    const list = listRef.current;
+    if (list?.contains(document.activeElement)) {
+      const current = rows.findIndex((row) => row.variant.id === id);
+      const next = rows
+        .slice(current + 1)
+        .concat(rows.slice(0, current))
+        .find((row) => row.phase !== 'exit');
+      const target =
+        next &&
+        list.querySelector<HTMLButtonElement>(
+          `[data-variant-id="${next.variant.id}"] .commerce-text-button`,
+        );
+      (target || list).focus();
+    }
+    removeItem(id);
+  }
+  return (
+    <div className="commerce-cart-content">
+      <ul
+        className="commerce-cart-items"
+        ref={listRef}
+        tabIndex={-1}
+        aria-label={t(locale, 'Artikel im Warenkorb', 'Bag items')}
+      >
+        {rows.map((row) => {
+          const { product, variant, quantity } = row;
+          return (
+            <AnimatedCartRow key={variant.id} row={row} finish={finish}>
+              <a className="commerce-cart-image" href={path(locale, `product/${product.slug}`)}>
+                <img src={product.image} alt={product.imageAlt[locale]} width="160" height="200" />
+              </a>
+              <div className="commerce-cart-item-info">
+                <div className="commerce-cart-item-top">
+                  <a href={path(locale, `product/${product.slug}`)}>{product.name}</a>
+                  <span>{money(product.price * quantity, locale)}</span>
+                </div>
+                <p>
+                  {variant.colorName[locale]} / {variant.size}
+                </p>
+                <div className="commerce-cart-item-bottom">
+                  <div className="commerce-quantity">
+                    <button
+                      type="button"
+                      disabled={quantity <= 1}
+                      aria-label={t(
+                        locale,
+                        `Menge von ${product.name} verringern`,
+                        `Decrease quantity of ${product.name}`,
+                      )}
+                      onClick={() => setQuantity(variant.id, quantity - 1)}
+                    >
+                      −
+                    </button>
+                    <label className="commerce-sr-only" htmlFor={`${uid}-${variant.id}`}>
+                      {t(locale, `Menge für ${product.name}`, `Quantity for ${product.name}`)}
+                    </label>
+                    <input
+                      id={`${uid}-${variant.id}`}
+                      type="number"
+                      min="1"
+                      max={variant.stock}
+                      value={quantity}
+                      inputMode="numeric"
+                      onChange={(event) => {
+                        const value = Number(event.target.value);
+                        if (Number.isFinite(value) && value >= 1)
+                          setQuantity(variant.id, Math.min(variant.stock, Math.floor(value)));
+                      }}
+                    />
+                    <button
+                      type="button"
+                      disabled={quantity >= variant.stock}
+                      aria-label={t(
+                        locale,
+                        `Menge von ${product.name} erhöhen`,
+                        `Increase quantity of ${product.name}`,
+                      )}
+                      onClick={() => setQuantity(variant.id, quantity + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    className="commerce-text-button"
+                    aria-label={t(locale, `${product.name} entfernen`, `Remove ${product.name}`)}
+                    onClick={() => remove(variant.id)}
+                  >
+                    {t(locale, 'Entfernen', 'Remove')}
+                  </button>
+                </div>
+                {quantity >= variant.stock && (
+                  <small className="commerce-stock-limit">
+                    {t(locale, 'Maximaler Demo-Bestand erreicht', 'Maximum demo stock reached')}
+                  </small>
+                )}
               </div>
-              <button
-                type="button"
-                className="commerce-text-button"
-                aria-label={t(locale, `${product.name} entfernen`, `Remove ${product.name}`)}
-                onClick={() => removeItem(variant.id)}
-              >
-                {t(locale, 'Entfernen', 'Remove')}
-              </button>
-            </div>
-            {quantity >= variant.stock && (
-              <small className="commerce-stock-limit">
-                {t(locale, 'Maximaler Demo-Bestand erreicht', 'Maximum demo stock reached')}
-              </small>
-            )}
-          </div>
-        </li>
-      ))}
-    </ul>
+            </AnimatedCartRow>
+          );
+        })}
+      </ul>
+      {!rows.length && (
+        <div ref={emptyRef}>
+          <EmptyCart locale={locale} close={close} />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -215,9 +304,9 @@ export function CartPage({ locale }: { locale: Locale }) {
         </a>
       </div>
       <StorageNotice locale={locale} />
-      {totals.count ? (
-        <div className="commerce-cart-grid">
-          <CartItems locale={locale} />
+      <div className="commerce-cart-grid">
+        <CartItems locale={locale} />
+        {totals.count > 0 && (
           <aside className="commerce-cart-summary">
             <h2>{t(locale, 'Deine Übersicht', 'Order summary')}</h2>
             <OrderTotals locale={locale} />
@@ -233,10 +322,8 @@ export function CartPage({ locale }: { locale: Locale }) {
               )}
             </p>
           </aside>
-        </div>
-      ) : (
-        <EmptyCart locale={locale} />
-      )}
+        )}
+      </div>
     </section>
   );
 }
@@ -246,6 +333,8 @@ export function CartDrawer({ locale }: { locale: Locale }) {
   const items = useStore($cart, { ssr: 'initial' });
   const totals = cartTotals(items);
   const ref = useRef<HTMLDialogElement>(null);
+  const interruptedTransform = useRef<string | null>(null);
+  const [visible, setVisible] = useState(false);
   const uid = useId();
   useEffect(() => {
     hydrateCart();
@@ -253,23 +342,60 @@ export function CartDrawer({ locale }: { locale: Locale }) {
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-    if (!open) return;
+    if (open) {
+      setVisible(true);
+      if (!dialog.open) {
+        interruptedTransform.current = null;
+        dialog.showModal();
+      } else if (interruptedTransform.current) {
+        const from = interruptedTransform.current;
+        interruptedTransform.current = null;
+        return slide(dialog, from, 'none', 280, () => {});
+      }
+      return;
+    }
+    if (dialog.open) {
+      const cancel = slide(
+        dialog,
+        getComputedStyle(dialog).transform,
+        'translateX(100%)',
+        380,
+        () => {
+          if (!$cartOpen.get()) {
+            dialog.close();
+            setVisible(false);
+          }
+        },
+      );
+      return () => {
+        if (dialog.open) interruptedTransform.current = getComputedStyle(dialog).transform;
+        cancel?.();
+      };
+    }
+  }, [open]);
+  useEffect(() => {
+    if (!visible) return;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = overflow;
     };
-  }, [open]);
+  }, [visible]);
   const close = () => $cartOpen.set(false);
   return (
     <dialog
       ref={ref}
       className="commerce commerce-dialog commerce-cart-drawer"
+      data-state={open ? 'open' : visible ? 'closing' : 'closed'}
       aria-labelledby={`${uid}-title`}
-      onClose={close}
-      onCancel={close}
+      onClose={() => {
+        setVisible(false);
+        close();
+      }}
+      onCancel={(event) => {
+        event.preventDefault();
+        close();
+      }}
       onClick={(event) => {
         if (event.target === event.currentTarget) close();
       }}
@@ -290,18 +416,14 @@ export function CartDrawer({ locale }: { locale: Locale }) {
           </button>
         </div>
         <div className="commerce-drawer-body">
-          {open && (
+          {visible && (
             <>
               <StorageNotice locale={locale} />
-              {totals.count > 0 ? (
-                <CartItems locale={locale} />
-              ) : (
-                <EmptyCart locale={locale} close={close} />
-              )}
+              <CartItems locale={locale} close={close} />
             </>
           )}
         </div>
-        {open && totals.count > 0 && (
+        {visible && totals.count > 0 && (
           <div className="commerce-drawer-footer">
             <OrderTotals locale={locale} compact />
             <a className="commerce-button" href={path(locale, 'checkout')} onClick={close}>
