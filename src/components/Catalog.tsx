@@ -4,6 +4,8 @@ import { categoryNames, t, money } from '../lib/i18n';
 import { defaultFilters, filtersFromSearch, filterProducts, type Filters } from '../lib/filter';
 import type { Locale, Category } from '../lib/types';
 import CatalogResults from './CatalogResults';
+import FilterChips from './FilterChips';
+import FilterDialog from './FilterDialog';
 export default function Catalog({ locale }: { locale: Locale }) {
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [ready, setReady] = useState(false);
@@ -158,28 +160,30 @@ export default function Catalog({ locale }: { locale: Locale }) {
         <p role="status">
           {results.length} {t(locale, 'Produkte', 'products')}
         </p>
-        <div className="filter-chips">
-          {(Object.entries(filters) as [keyof Filters, string][])
-            .filter(([k, v]) => v && k !== 'sort')
-            .map(([key, value]) => (
-              <button key={key} onClick={() => update(key, '')}>
-                {key === 'category'
-                  ? categoryNames[value as Category]?.[locale] || value
-                  : key === 'color'
-                    ? colors.find((c) => c.color === value)?.colorName[locale] || value
-                    : key === 'price'
-                      ? `${t(locale, 'Bis', 'Up to')} ${money(Number(value), locale)}`
-                      : value}
-                <span aria-hidden="true">×</span>
-                <span className="sr-only">{t(locale, 'Filter entfernen', 'Remove filter')}</span>
-              </button>
-            ))}
-          {Object.keys(filters).some((k) => k !== 'sort' && filters[k as keyof Filters]) && (
-            <button className="clear-filters" onClick={reset}>
-              {t(locale, 'Zurücksetzen', 'Reset all')}
-            </button>
-          )}
-        </div>
+        <FilterChips
+          locale={locale}
+          searchRef={search}
+          onRemove={(key) => update(key, '')}
+          onReset={reset}
+          chips={[
+            ...(Object.entries(filters) as [keyof Filters, string][])
+              .filter(([key, value]) => value && key !== 'sort')
+              .map(([id, value]) => ({
+                id,
+                label:
+                  id === 'category'
+                    ? categoryNames[value as Category]?.[locale] || value
+                    : id === 'color'
+                      ? colors.find((color) => color.color === value)?.colorName[locale] || value
+                      : id === 'price'
+                        ? `${t(locale, 'Bis', 'Up to')} ${money(Number(value), locale)}`
+                        : value,
+              })),
+            ...(Object.keys(filters).some((key) => key !== 'sort' && filters[key as keyof Filters])
+              ? [{ id: 'reset' as const, label: t(locale, 'Zurücksetzen', 'Reset all') }]
+              : []),
+          ]}
+        />
       </div>
       <CatalogResults
         products={results}
@@ -189,29 +193,9 @@ export default function Catalog({ locale }: { locale: Locale }) {
         onReset={reset}
         searchRef={search}
       />
-      <dialog
-        className="filter-dialog"
-        ref={dialog}
-        aria-label={t(locale, 'Produktfilter', 'Product filters')}
-      >
-        <div className="dialog-top">
-          <h2>{t(locale, 'Deine Filter', 'Your filters')}</h2>
-          <button
-            className="icon-button"
-            onClick={() => dialog.current?.close()}
-            aria-label={t(locale, 'Filter schließen', 'Close filters')}
-          >
-            ×
-          </button>
-        </div>
+      <FilterDialog locale={locale} dialogRef={dialog} count={results.length} onReset={reset}>
         {filterFields('mobile')}
-        <button className="btn" onClick={() => dialog.current?.close()}>
-          {results.length} {t(locale, 'Produkte anzeigen', 'products — show results')} ↗
-        </button>
-        <button className="text-button" onClick={reset}>
-          {t(locale, 'Zurücksetzen', 'Reset all')}
-        </button>
-      </dialog>
+      </FilterDialog>
     </section>
   );
 }

@@ -8,7 +8,7 @@ Stand der Funktions- und Browserprüfungen: 10. September 2026. Geprüft wurde d
 | ----------------------------------------- | -------------------------------------------------------------- |
 | Astro / TypeScript                        | 0 Fehler, 0 Warnungen                                          |
 | Vitest                                    | 34 Tests bestanden                                             |
-| Playwright Desktop + Mobil                | 60 Tests bestanden, 2 bewusst übersprungene Prüfungen          |
+| Playwright Desktop + Mobil                | 66 Tests bestanden, 2 bewusst übersprungene Prüfungen          |
 | Statischer Build                          | 46 Seiten erfolgreich erzeugt                                  |
 | Formatprüfung                             | Bestanden                                                      |
 | axe auf den geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
@@ -43,7 +43,9 @@ Produktbilder wechseln mit einem vollständigen horizontalen Swipe (360 ms), üb
 
 Kategorie-Wechsel schieben die Produktgruppe entsprechend der Registerkarten-Reihenfolge nach links oder rechts. Bei Suche und Filtern verlassen ausgeschlossene Karten ihre Plätze nach links, verbleibende Treffer nach rechts; anschließend fährt die neue Trefferliste von rechts herein. So springt beim Neuordnen keine noch sichtbare Karte auf ihre Startposition. Die Ausgangsbewegung dauert 220 ms, die Eingangsbewegung 340 ms, ohne Änderung der Deckkraft. Während der Ausgangsbewegung sind alte Ergebnisse nicht mehr fokussierbar oder für assistive Technik erreichbar. Suchfeld, Filter, Trefferzahl und URL reagieren unmittelbar; neue Eingaben brechen überholte Bewegungen ab. Die Prüfungen decken Deutsch und Englisch, beide Swipe-Richtungen, leere Trefferlisten, Zurücksetzen mit Fokusrückgabe, Navigation zurück zum Katalog, Neuladen sowie eine während des Wechsels aktivierte Bewegungsreduktion ab.
 
-Der Produktfilter fährt von unten herein (380 ms); Bildansicht und Größenhilfe bewegen sich von unterhalb des Bildschirms in ihre zentrierte Position (420 ms). Bei `prefers-reduced-motion: reduce` erfolgen die Zustandswechsel unmittelbar. Automatisierte Prüfungen decken die Bewegungen einschließlich Fokus, letzten Warenkorbartikel, schnelle Bild- und Akkordeonwechsel, Mauslupe, Touchgesten und reduzierte Bewegung ab.
+Aktive Filter-Tags fahren beim Entfernen und Zurücksetzen seitlich hinaus (260 ms). URL und Filterwirkung ändern sich sofort; die ausfahrenden Tags sind nicht mehr bedienbar. Erneutes Auswählen während der Bewegung verwirft den alten Ausgang, ohne den neuen Filter zu entfernen. Nach dem Wegklicken erhält das Suchfeld den Fokus. Deutsch, Englisch und eine während der Bewegung aktivierte Bewegungsreduktion sind geprüft.
+
+Der Produktfilter fährt von unten herein und beim Schließen vollständig nach unten hinaus (je 380 ms). Das gilt für Schließen-Button, Ergebnis-Button, Escape und Hintergrundklick; Klicks auf den Innenabstand lassen ihn geöffnet. Dialogfokus und modaler Zustand bleiben bis zum Ende der Ausgangsbewegung erhalten, danach kehrt der Fokus zum Öffner zurück. Bildansicht und Größenhilfe bewegen sich von unterhalb des Bildschirms in ihre zentrierte Position (420 ms). Bei `prefers-reduced-motion: reduce` erfolgen die Zustandswechsel unmittelbar. Automatisierte Prüfungen decken die Bewegungen einschließlich Fokus, letzten Warenkorbartikel, schnelle Bild- und Akkordeonwechsel, Mauslupe, Touchgesten und reduzierte Bewegung ab.
 
 ## Reproduzierbare Labormessung
 

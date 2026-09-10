@@ -1,0 +1,15 @@
+.filter-chip-slot {
+  display: grid;
+  min-width: 0;
+  max-width: 100%;
+  overflow: clip;
+  overflow-clip-margin: 4px;
+}
+
+.filter-chip-slot button {
+  overflow-wrap: anywhere;
+}
+
+.filter-chip-slot[data-state='exit'] {
+  pointer-events: none;
+}
