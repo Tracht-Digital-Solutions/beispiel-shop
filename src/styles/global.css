@@ -1724,9 +1724,9 @@ dialog:not([open]) {
   }
   *,
   *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+  *::after,
+  *::backdrop {
+    animation: none !important;
+    transition: none !important;
   }
 }
