@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f5f4ef"><meta name="generator" content="Astro v7.3.1"><title>Die Marke — BLOCK/01</title><meta name="description" content="Streetwear für deinen eigenen Rhythmus. Entdecke BLOCK/01, die interaktive Shop-Arbeitsprobe von Tracht Digital Solutions."><meta name="robots" content="noindex,follow"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta property="og:title" content="Die Marke — BLOCK/01"><meta property="og:description" content="Streetwear für deinen eigenen Rhythmus. Entdecke BLOCK/01, die interaktive Shop-Arbeitsprobe von Tracht Digital Solutions."><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:image" content="/images/hero.webp"><meta name="twitter:card" content="summary_large_image"><style>@view-transition {
+  navigation: auto;
+}
+
+/* The entire viewport, including header and footer, moves as one page. */
+::view-transition-group(root) {
+  animation: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-language-swipe]::view-transition-old(root),
+  :root[data-language-swipe]::view-transition-new(root) {
+    animation-duration: 460ms;
+    animation-timing-function: cubic-bezier(0.22, 0.7, 0.25, 1);
+    animation-fill-mode: both;
+  }
+  :root[data-language-swipe='forward']::view-transition-old(root) {
+    animation-name: language-out-left;
+  }
+  :root[data-language-swipe='forward']::view-transition-new(root) {
+    animation-name: language-in-right;
+  }
+  :root[data-language-swipe='backward']::view-transition-old(root) {
+    animation-name: language-out-right;
+  }
+  :root[data-language-swipe='backward']::view-transition-new(root) {
+    animation-name: language-in-left;
+  }
+}
+
+@keyframes language-out-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes language-in-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes language-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes language-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+</style><script>// This classic head script must register pagereveal before the first render.
+// Keep cross-document navigation so Astro islands and cart hydration retain their lifecycle.
+(() => {
+  const root = document.documentElement;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function direction(from, to) {
+    if (!from || !to) return null;
+    const previous = new URL(from, location.href);
+    const next = new URL(to, location.href);
+    const a = previous.pathname.match(/^\/(de|en)(\/.*)$/);
+    const b = next.pathname.match(/^\/(de|en)(\/.*)$/);
+    if (previous.origin !== next.origin || !a || !b || a[1] === b[1] || a[2] !== b[2]) return null;
+    return b[1] === 'en' ? 'forward' : 'backward';
+  }
+  function prepare(transition, from, to) {
+    delete root.dataset.languageSwipe;
+    if (!transition) return;
+    const movement = direction(from, to);
+    if (!movement || reduced.matches) {
+      transition.skipTransition();
+      return;
+    }
+    root.dataset.languageSwipe = movement;
+    const stop = () => {
+      if (reduced.matches) transition.skipTransition();
+    };
+    reduced.addEventListener('change', stop);
+    transition.finished.then(() => {
+      delete root.dataset.languageSwipe;
+      reduced.removeEventListener('change', stop);
+    });
+  }
+  window.addEventListener('pageswap', (event) => {
+    prepare(event.viewTransition, event.activation?.from?.url, event.activation?.entry?.url);
+  });
+  window.addEventListener('pagereveal', (event) => {
+    const activation = window.navigation?.activation;
+    prepare(event.viewTransition, activation?.from?.url ?? document.referrer, location.href);
+  });
+})();
+</script><link rel="stylesheet" href="/_astro/Layout.B9pRhYZX.css"></head><body><a class="skip-link" href="#main">Zum Inhalt</a><style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var g=Object.defineProperty;var w=(a,s,c)=>s in a?g(a,s,{enumerable:!0,configurable:!0,writable:!0,value:c}):a[s]=c;var l=(a,s,c)=>w(a,typeof s!="symbol"?s+"":s,c);var E=new Set(["__proto__","constructor","prototype"]);{let a={0:t=>y(t),1:t=>c(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(c(t)),5:t=>new Set(c(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>Number.POSITIVE_INFINITY*t},s=t=>{let[p,e]=t;return p in a?a[p](e):void 0},c=t=>t.map(s),y=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([p,e])=>[p,s(e)]));class f extends HTMLElement{constructor(){super(...arguments);l(this,"Component");l(this,"hydrator");l(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let r=this.querySelectorAll("astro-slot"),n={},d=this.querySelectorAll("template[data-astro-template]");for(let o of d){let i=o.closest(this.tagName);i!=null&&i.isSameNode(this)&&(n[o.getAttribute("data-astro-template")||"default"]=o.innerHTML,o.remove())}for(let o of r){let i=o.closest(this.tagName);i!=null&&i.isSameNode(this)&&(n[o.getAttribute("name")||"default"]=o.innerHTML)}let u;try{u=this.hasAttribute("props")?y(JSON.parse(this.getAttribute("props"))):{}}catch(o){let i=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(i+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${i}`,this.getAttribute("props"),o),o}let h;await this.hydrator(this)(this.Component,u,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});l(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}getRetryImportUrl(e){let r=new URL(e,document.baseURI);return r.searchParams.set("astro-retry",Date.now().toString()),r.toString()}async importWithRetry(e){try{return await import(e)}catch(r){return await new Promise(n=>setTimeout(n,1e3)),import(this.getRetryImportUrl(e))}}handleHydrationError(e){let r=this.getAttribute("component-url"),n=new CustomEvent("astro:hydration-error",{cancelable:!0,bubbles:!0,composed:!0,detail:{error:e,componentUrl:r}});this.dispatchEvent(n)&&console.error(`[astro-island] Error hydrating ${r}`,e)}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let n=this.getAttribute("renderer-url");try{let[d,{default:u}]=await Promise.all([this.importWithRetry(this.getAttribute("component-url")),n?this.importWithRetry(n):Promise.resolve({default:()=>()=>{}})]),h=this.getAttribute("component-export")||"default";if(h.includes(".")){this.Component=d;for(let m of h.split(".")){if(E.has(m)||!this.Component||typeof this.Component!="object"&&typeof this.Component!="function"||!Object.hasOwn(this.Component,m))throw new Error(`Invalid component export path: ${h}`);this.Component=this.Component[m]}}else{if(E.has(h))throw new Error(`Invalid component export path: ${h}`);this.Component=d[h]}return this.hydrator=u,this.hydrate}catch(d){return this.handleHydrationError(d),()=>{}}},e,this)}catch(n){this.handleHydrationError(n)}}attributeChangedCallback(){this.hydrate()}}l(f,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",f)}})();</script><astro-island uid="1tvLP" prefix="r2" component-url="/_astro/SiteHeader.CoYNS7hV.js" component-export="default" renderer-url="/_astro/client.DnM_O5Vj.js" props="{&quot;locale&quot;:[0,&quot;de&quot;],&quot;route&quot;:[0,&quot;about&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;SiteHeader&quot;,&quot;value&quot;:true}" await-children><div class="announcement"><span>INDEPENDENT SPIRIT. EVERYDAY UNIFORM.</span><span class="announcement-demo">Demo-Shop · Keine echten Bestellungen</span></div><header class="site-header"><a class="wordmark" href="/de/" aria-label="BLOCK/01 Home">BLOCK<span>/</span>01</a><nav class="desktop-nav" aria-label="Hauptnavigation"><a class="" href="/de/shop/">Shop</a><a class="" href="/de/lookbook/">Lookbook <span class="nav-dot"></span></a><a class="current" href="/de/about/">Die Marke</a></nav><div class="header-actions"><a class="language-link" href="/en/about/" hrefLang="en" aria-label="DE / EN: Switch to English">DE<!-- --> <span>/ <!-- -->EN</span></a><a class="search-link icon-button" href="/de/shop/#catalog-search" aria-label="Suchen"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 5 5"></path></svg></a><button class="cart-button" aria-label="Warenkorb öffnen, 00"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 7h14l1 14H4L5 7Z"></path><path d="M8 8V6a4 4 0 0 1 8 0v2"></path></svg><span class="cart-number">00</span></button><button class="mobile-menu-button icon-button" aria-label="Menü öffnen"><svg width="23" height="20" viewBox="0 0 23 20" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 5h21M1 14h21"></path></svg></button></div></header><dialog class="menu-dialog" aria-label="Hauptmenü"><div class="dialog-top"><span class="wordmark">BLOCK/01</span><button class="icon-button" aria-label="Menü schließen">×</button></div><nav aria-label="Mobile Navigation"><a class="" href="/de/shop/">Shop</a><a class="" href="/de/lookbook/">Lookbook <span class="nav-dot"></span></a><a class="current" href="/de/about/">Die Marke</a></nav><a class="btn" href="/de/shop/">Kollektion entdecken<!-- --> ↗</a><p class="eyebrow">A DIFFERENT KIND OF EVERYDAY.</p></dialog><!--astro:end--></astro-island><main id="main"><section class="about-hero section-shell"><span class="eyebrow">INDEPENDENT BY DESIGN / EST. 2026</span><h1>WENIGER LÄRM.<br><span class="outline-title">MEHR DU.</span></h1><p>BLOCK/01 ist eine Idee von Freiheit im Alltag. Von Kleidung, die Raum lässt. Für Bewegung, für Persönlichkeit, für deinen eigenen Weg.</p></section><div class="about-image"><img src="/images/hero.webp" width="1920" height="1080" alt="Die Bildwelt der fiktiven Streetwear-Marke BLOCK/01" loading="lazy"></div><section class="section-shell about-columns"><span class="eyebrow">THE BLOCK/01 MINDSET</span><div><h2>GUTE BASICS. EIGENE WEGE.</h2><p>Unsere fiktive Kollektion beginnt bei klaren Silhouetten, spürbaren Texturen und Farben, die miteinander funktionieren. Shirts, Hoodies, Hosen und Accessoires bilden eine Garderobe, die sich immer neu kombinieren lässt.</p><a href="/de/shop/" class="arrow-link">Finde deine Essentials ↗</a></div></section><section class="section-shell info-section" id="shipping"><span class="eyebrow">GOOD TO KNOW</span><h2>VERSAND &amp; RÜCKGABE</h2><div class="info-grid"><div><h3>So funktioniert der Demo-Versand</h3><p>Wir zeigen einen beispielhaften Versand innerhalb Deutschlands: 4,90 € Versandkosten, ab 100 € Warenwert versandkostenfrei. Die angezeigte Lieferzeit beträgt beispielhaft 2–4 Werktage. Es wird keine Ware versendet.</p></div><div><h3>Rückgabe in dieser Arbeitsprobe</h3><p>Alle Artikel und Angebote sind fiktiv. Da keine Kaufverträge entstehen, gibt es keine tatsächlichen Rücksendungen. Du kannst den Warenkorb jederzeit bearbeiten und den Kaufablauf beliebig oft ausprobieren.</p></div></div></section><section class="demo-info" id="demo"><div class="section-shell"><span class="eyebrow">DESIGNED & BUILT BY TRACHT DIGITAL SOLUTIONS</span><h2>EIN SHOP. VIELE MÖGLICHKEITEN.</h2><p>Diese Website ist eine interaktive Arbeitsprobe. BLOCK/01 ist eine fiktive Marke; Bilder wurden mit KI für die Demo erstellt. Du kannst Produkte entdecken, den Warenkorb nutzen und eine Bestellung simulieren. Es werden keine echten Bestellungen, Zahlungen oder E-Mails ausgelöst.</p><p>Dein Warenkorb wird nur in deinem Browser gespeichert. Adressdaten bleiben während des Checkouts im Arbeitsspeicher und werden nicht an einen Bestellservice gesendet. Schriften und Bilder werden lokal bereitgestellt; der Shop verwendet keine Analyse- oder Marketingdienste. Angaben zum Hosting ergänzt der Betreiber beim Deployment.</p><a href="https://tracht-digital.de/" class="btn btn-orange" target="_blank" rel="noreferrer">Tracht Digital Solutions ↗</a></div></section></main><footer class="site-footer"><div class="footer-top"><div><a class="footer-wordmark" href="/de/">BLOCK/01</a><p>Für deinen eigenen Rhythmus.<br>Independent spirit. Everyday uniform.</p></div><div class="footer-links"><div><span class="eyebrow">EXPLORE</span><a href="/de/shop/">Alle Produkte</a><a href="/de/lookbook/">Lookbook</a><a href="/de/about/">Die Marke</a></div><div><span class="eyebrow">INFORMATION</span><a href="/de/about/#shipping">Versand &amp; Rückgabe</a><a href="/de/about/#demo">Über diese Demo</a><a href="https://tracht-digital.de/" target="_blank" rel="noreferrer">Tracht Digital Solutions ↗</a></div></div></div><div class="footer-bottom"><span>© 2026 BLOCK/01 — Fiktive Demo-Marke</span><span>Keine echten Bestellungen.</span></div></footer><aside class="tds-brand-bar" aria-label="Tracht Digital Solutions" data-astro-cid-losyg2x3><div class="tds-brand-inner" data-astro-cid-losyg2x3><div class="tds-brand-signature" data-astro-cid-losyg2x3><span class="tds-brand-kicker" data-astro-cid-losyg2x3>Design &amp; digitale Umsetzung</span><strong data-astro-cid-losyg2x3>Tracht Digital Solutions</strong><span class="tds-brand-stripes" aria-hidden="true" data-astro-cid-losyg2x3><i data-astro-cid-losyg2x3></i><i data-astro-cid-losyg2x3></i><i data-astro-cid-losyg2x3></i></span></div><nav class="tds-brand-actions" aria-label="TDS Website und Kontakt" data-astro-cid-losyg2x3><a class="tds-brand-button tds-brand-button--website" href="https://tracht-digital.de/" target="_blank" rel="noopener noreferrer" aria-label="Zur Website von Tracht Digital Solutions (öffnet neuen Tab)" data-astro-cid-losyg2x3>Zur Website<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-astro-cid-losyg2x3><path d="M15 3h6v6M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" data-astro-cid-losyg2x3></path></svg></a><a class="tds-brand-button tds-brand-button--contact" href="https://tracht-digital.de/#contact" target="_blank" rel="noopener noreferrer" aria-label="Zum Kontaktformular von Tracht Digital Solutions (öffnet neuen Tab)" data-astro-cid-losyg2x3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-astro-cid-losyg2x3><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2ZM8 8h8M8 12h6" data-astro-cid-losyg2x3></path></svg>Zum Kontaktformular</a></nav></div></aside><astro-island uid="Z17qV84" prefix="r3" component-url="/_astro/Cart.DxrW_HTn.js" component-export="CartDrawer" renderer-url="/_astro/client.DnM_O5Vj.js" props="{&quot;locale&quot;:[0,&quot;de&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;CartDrawer&quot;,&quot;value&quot;:true}" await-children><dialog class="commerce commerce-dialog commerce-cart-drawer" data-state="closed" aria-labelledby="_r3R_0_-title"><div class="commerce-drawer-shell"><div class="commerce-drawer-header"><h2 id="_r3R_0_-title">Dein Warenkorb<!-- --> <span>(<!-- -->0<!-- -->)</span></h2><button type="button" class="commerce-close" aria-label="Warenkorb schließen" autofocus="">×</button></div><div class="commerce-drawer-body"></div></div></dialog><!--astro:end--></astro-island></body></html>

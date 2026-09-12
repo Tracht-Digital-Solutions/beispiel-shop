@@ -1,0 +1,11 @@
+{
+  "channel": "dev",
+  "commit": "f4ca4b1b4b6b6b8ae6095ca5a6c7ceeeae618868",
+  "shortCommit": "f4ca4b1",
+  "ref": "refs/heads/main",
+  "builtAt": "2026-09-12T13:59:00.507Z",
+  "runId": "34697912425",
+  "runUrl": "https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions/runs/34697912425",
+  "workflow": "Dev build → dev branch",
+  "demo": true
+}
