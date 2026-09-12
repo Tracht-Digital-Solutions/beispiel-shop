@@ -9,11 +9,20 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
   const mobile = useRef<HTMLDialogElement>(null);
   useEffect(hydrateCart, []);
   const other = locale === 'de' ? 'en' : 'de';
-  const changeLanguage = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (location.search) {
-      event.preventDefault();
-      location.href = path(other, route) + location.search;
-    }
+  const changeLanguage = (event: React.SyntheticEvent<HTMLAnchorElement>) => {
+    // Keep native navigation, including modified clicks and opening another tab.
+    event.currentTarget.href = path(other, route) + location.search + location.hash;
+  };
+  const openSearch = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (route !== 'shop') return;
+    event.currentTarget.href = path(locale, 'shop') + location.search + '#catalog-search';
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+      return;
+    const input = document.getElementById('catalog-search');
+    if (!(input instanceof HTMLInputElement)) return;
+    event.preventDefault();
+    input.focus({ preventScroll: true });
+    input.scrollIntoView({ block: 'center', behavior: 'instant' });
   };
   const nav = (
     <>
@@ -48,6 +57,8 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
             className="language-link"
             href={path(other, route)}
             onClick={changeLanguage}
+            onPointerDown={changeLanguage}
+            onFocus={changeLanguage}
             hrefLang={other}
             aria-label={`${locale.toUpperCase()} / ${other.toUpperCase()}: ${t(locale, 'Switch to English', 'Auf Deutsch wechseln')}`}
           >
@@ -55,7 +66,8 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
           </a>
           <a
             className="search-link icon-button"
-            href={path(locale, 'shop')}
+            href={path(locale, 'shop') + '#catalog-search'}
+            onClick={openSearch}
             aria-label={t(locale, 'Suchen', 'Search')}
           >
             <svg

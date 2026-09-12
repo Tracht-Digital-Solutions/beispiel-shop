@@ -11,12 +11,24 @@ export default function Catalog({ locale }: { locale: Locale }) {
   const [ready, setReady] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const search = useRef<HTMLInputElement>(null);
+  const summary = useRef<HTMLParagraphElement>(null);
   useEffect(() => {
     setFilters(filtersFromSearch(location.search));
     setReady(true);
     const pop = () => setFilters(filtersFromSearch(location.search));
     window.addEventListener('popstate', pop);
-    return () => window.removeEventListener('popstate', pop);
+    const focusSearch = () => {
+      if (location.hash === '#catalog-search') {
+        search.current?.focus({ preventScroll: true });
+        search.current?.scrollIntoView({ block: 'center', behavior: 'instant' });
+      }
+    };
+    focusSearch();
+    window.addEventListener('hashchange', focusSearch);
+    return () => {
+      window.removeEventListener('popstate', pop);
+      window.removeEventListener('hashchange', focusSearch);
+    };
   }, []);
   function update(key: keyof Filters, value: string) {
     const next = { ...filters, [key]: value };
@@ -25,11 +37,21 @@ export default function Catalog({ locale }: { locale: Locale }) {
     Object.entries(next).forEach(([k, v]) => {
       if (v && v !== defaultFilters[k as keyof Filters]) params.set(k, v);
     });
-    history.replaceState(null, '', `${location.pathname}${params.size ? '?' + params : ''}`);
+    history.replaceState(
+      null,
+      '',
+      `${location.pathname}${params.size ? '?' + params : ''}${location.hash}`,
+    );
   }
   function reset() {
     setFilters(defaultFilters);
-    history.replaceState(null, '', location.pathname);
+    history.replaceState(null, '', location.pathname + location.hash);
+  }
+  function submitSearch(event: React.SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const target = filters.q.trim() ? summary.current : search.current;
+    target?.focus({ preventScroll: true });
+    target?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   const results = useMemo(() => filterProducts(products, filters, locale), [filters, locale]);
   const colors = Array.from(
@@ -108,28 +130,39 @@ export default function Catalog({ locale }: { locale: Locale }) {
         ))}
       </div>
       <div className="catalog-toolbar">
-        <label className="search-field">
-          <span className="sr-only">{t(locale, 'Produkte suchen', 'Search products')}</span>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            aria-hidden="true"
+        <form className="search-field" role="search" onSubmit={submitSearch}>
+          <label className="sr-only" htmlFor="catalog-search">
+            {t(locale, 'Produkte suchen', 'Search products')}
+          </label>
+          <button
+            className="search-submit"
+            type="submit"
+            aria-label={t(locale, 'Suchen', 'Search')}
           >
-            <circle cx="10.5" cy="10.5" r="6.5" />
-            <path d="m16 16 5 5" />
-          </svg>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              aria-hidden="true"
+            >
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m16 16 5 5" />
+            </svg>
+          </button>
           <input
+            id="catalog-search"
+            name="q"
+            enterKeyHint="search"
             ref={search}
             type="search"
             placeholder={t(locale, 'Finde dein nächstes Essential', 'Find your next essential')}
             value={filters.q}
             onChange={(e) => update('q', e.target.value)}
           />
-        </label>
+        </form>
         <div className="desktop-filters">{filterFields('desktop')}</div>
         <button
           className="mobile-filter-button btn-outline"
@@ -157,7 +190,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
         </label>
       </div>
       <div className="catalog-status">
-        <p role="status">
+        <p ref={summary} role="status" tabIndex={-1} className="search-summary">
           {results.length} {t(locale, 'Produkte', 'products')}
         </p>
         <FilterChips

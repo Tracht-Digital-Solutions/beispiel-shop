@@ -1,0 +1,56 @@
+@view-transition {
+  navigation: auto;
+}
+
+/* The entire viewport, including header and footer, moves as one page. */
+::view-transition-group(root) {
+  animation: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-language-swipe]::view-transition-old(root),
+  :root[data-language-swipe]::view-transition-new(root) {
+    animation-duration: 460ms;
+    animation-timing-function: cubic-bezier(0.22, 0.7, 0.25, 1);
+    animation-fill-mode: both;
+  }
+  :root[data-language-swipe='forward']::view-transition-old(root) {
+    animation-name: language-out-left;
+  }
+  :root[data-language-swipe='forward']::view-transition-new(root) {
+    animation-name: language-in-right;
+  }
+  :root[data-language-swipe='backward']::view-transition-old(root) {
+    animation-name: language-out-right;
+  }
+  :root[data-language-swipe='backward']::view-transition-new(root) {
+    animation-name: language-in-left;
+  }
+}
+
+@keyframes language-out-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes language-in-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes language-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes language-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+}

@@ -940,6 +940,24 @@ dialog:not([open]) {
   font-size: 11px;
   min-width: 0;
 }
+.search-submit {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+}
+.search-submit svg {
+  flex-shrink: 0;
+}
+.search-summary:focus-visible {
+  outline: 3px solid #ad3714;
+  outline-offset: 4px;
+}
+.search-summary,
+#catalog-search {
+  scroll-margin-top: 120px;
+}
 .desktop-filters {
   display: flex;
   gap: 15px;

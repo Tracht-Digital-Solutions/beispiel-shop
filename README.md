@@ -8,8 +8,8 @@ Ein zweisprachiger Online-Shop als Design- und Frontend-Arbeitsprobe von [Tracht
 
 ## Shop erkunden
 
-- Deutsch und Englisch unter `/de/` und `/en/`; `/` führt zur deutschen Startseite.
-- 16 Beispielprodukte mit Suche, Filtern und Sortierung sowie Produktseiten mit Größenwahl, Verfügbarkeit und Produktinformationen.
+- Deutsch und Englisch unter `/de/` und `/en/`; `/` führt zur deutschen Startseite. Der Sprachwechsel schiebt die ganze Seite seitlich und erhält Route, Suche, Filter und Warenkorb.
+- 16 Beispielprodukte mit Suche, Filtern und Sortierung sowie Produktseiten mit Größenwahl, Verfügbarkeit und Produktinformationen. Der Suchknopf und Enter führen zu den Treffern; die Lupe im Kopfbereich öffnet das Suchfeld.
 - Kategorie-Wechsel und Suchergebnisse mit vollständigen Swipe-Übergängen; schnelle Eingaben, URL-Wiederherstellung und reduzierte Bewegung bleiben unterstützt.
 - Produktgalerie mit Swipe-Bildwechsel, Mauslupe und verschiebbarer Vollbildvergrößerung; einschiebende Warenkorbartikel, Hover-Inhalte und Akkordeons.
 - Warenkorb mit Mengenänderung und transparenten Summen; Speicherung ausschließlich im Browser.

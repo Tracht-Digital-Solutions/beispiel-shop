@@ -4,6 +4,9 @@ import '@fontsource/barlow-condensed/600.css';
 import '@fontsource/barlow-condensed/700.css';
 import '../styles/global.css';
 import '../styles/motion.css';
+// The incoming document must opt in before its first pagereveal, even on a cold load.
+import languageSwipe from '../styles/language-swipe.css?raw';
+import languageNavigation from '../lib/language-navigation.js?raw';
 import SiteHeader from '../components/SiteHeader';
 import TdsBrandBar from '../components/TdsBrandBar.astro';
 import { CartDrawer } from '../components/Cart';
@@ -69,7 +72,10 @@ const canonical = Astro.site ? new URL(path(locale, route), Astro.site).href : u
     /><meta
       property="og:image"
       content={Astro.site ? new URL(image, Astro.site).href : image}
-    /><meta name="twitter:card" content="summary_large_image" /><slot name="head" /></head
+    /><meta name="twitter:card" content="summary_large_image" /><style
+      is:inline
+      set:html={languageSwipe}
+    ></style><script is:inline set:html={languageNavigation} /><slot name="head" /></head
   ><body
     ><a class="skip-link" href="#main">{t(locale, 'Zum Inhalt', 'Skip to content')}</a><SiteHeader
       locale={locale}

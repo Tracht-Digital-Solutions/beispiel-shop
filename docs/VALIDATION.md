@@ -1,6 +1,6 @@
 # Prüfung und Abnahme
 
-Stand der Funktions- und Browserprüfungen: 10. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Screenshots und Performance-Messungen stammen vom 8. September 2026. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
+Stand der Funktions- und Browserprüfungen: 12. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Screenshots und Performance-Messungen stammen vom 8. September 2026. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
 
 ## Ergebnis
 
@@ -8,7 +8,7 @@ Stand der Funktions- und Browserprüfungen: 10. September 2026. Geprüft wurde d
 | ----------------------------------------- | -------------------------------------------------------------- |
 | Astro / TypeScript                        | 0 Fehler, 0 Warnungen                                          |
 | Vitest                                    | 34 Tests bestanden                                             |
-| Playwright Desktop + Mobil                | 66 Tests bestanden, 2 bewusst übersprungene Prüfungen          |
+| Playwright Desktop + Mobil                | 76 Tests bestanden, 2 bewusst übersprungene Prüfungen          |
 | Statischer Build                          | 46 Seiten erfolgreich erzeugt                                  |
 | Formatprüfung                             | Bestanden                                                      |
 | axe auf den geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
@@ -16,6 +16,8 @@ Stand der Funktions- und Browserprüfungen: 10. September 2026. Geprüft wurde d
 Die 320- und 834-Pixel-Prüfung wird einmal im Desktop-Testprojekt ausgeführt; derselbe Fall ist im mobilen Projekt zur Vermeidung einer doppelten Ausführung übersprungen. Der Touchgesten-Test läuft ausschließlich im mobilen Projekt. Die Gesten werden in Chromium mit Touch-Eingaben nachgestellt; dies ersetzt keinen Test auf einem physischen Smartphone. Die Browserprüfungen schließen verzögert geladene interaktive Bereiche mit vorhandenem Warenkorb ein und prüfen dabei auf JavaScript- und Hydrationfehler.
 
 Ein zusätzlicher Test hält das Laden der Produktbedienung gezielt an: Bildzoom, Bildwechsel, Farbe, Größe und Größenhilfe bleiben währenddessen deaktiviert. Nach dem Laden funktionieren Bildzoom und Größenauswahl unmittelbar; ein früher Klick kann nicht mehr vor dem Aktivieren der Bedienung verloren gehen.
+
+Der lokale Abschlusslauf am 12. September verwendete Port 4327, weil Port 4321 durch ein anderes Projekt belegt war. Eine lokale Konfigurationsdatei änderte ausschließlich Vorschau-Adresse, Test- und Ausgabeordner; Browserprofile, Prüfungen und vier parallele Prozesse blieben erhalten. In GitHub Actions gilt weiterhin die reguläre Konfiguration mit Port 4321.
 
 ## Funktionsumfang der Prüfung
 
@@ -38,6 +40,10 @@ Die vergrößerten Produkt- und Lookbookbilder sowie die Größentabelle werden 
 Bei aktivierter Einstellung für reduzierte Bewegung werden weiches Scrollen und Bildbewegungen deaktiviert. Diese Einstellung wurde auf Desktop und Mobilgerät nachgestellt. Automatische Prüfungen und diese Bedienkontrollen sind keine vollständige WCAG-Konformitätszertifizierung; eine Prüfung mit realen assistiven Technologien bleibt eine separate Abnahme.
 
 Die Bedienanimationen verwenden ausschließlich Schiebebewegungen ohne Einblenden oder Zähler- und Buttonimpulse. Warenkorb und mobiles Menü fahren vollständig vom rechten Bildschirmrand herein (380 ms). Der Warenkorb schiebt sich beim Schließen wieder hinaus; Inhalt, Scrollsperre und Dialogfokus bleiben bis zum Abschluss erhalten. Artikel fahren hinein (360 ms) und hinaus (280 ms). Entfernen aktualisiert den gespeicherten Warenkorb sofort; nur die sichtbare Zeile bleibt für die Ausgangsbewegung bestehen. Erneutes Hinzufügen kann eine laufende Ausgangsbewegung abbrechen, ohne den neuen Artikel zu verlieren.
+
+Beim Sprachwechsel bewegt sich die gesamte sichtbare Seite einschließlich Kopf- und Fußbereich horizontal um eine volle Bildschirmbreite (460 ms). Deutsch → Englisch läuft nach links, Englisch → Deutsch nach rechts, ohne Überblendung. Route, Suchparameter, Filter, Sprungmarke und gespeicherter Warenkorb bleiben erhalten. Die Umsetzung nutzt [native Übergänge zwischen Dokumenten](https://developer.chrome.com/docs/web-platform/view-transitions/cross-document); die zugehörigen Styles und Ereignisse stehen direkt im Dokumentkopf bereit, damit auch ein früher erster Bildaufbau den Übergang erhält. Normale Seitennavigation, fehlende Browserunterstützung und reduzierte Bewegung wechseln unmittelbar. Desktop und Mobilgerät prüfen beide Richtungen und die unveränderte Deckkraft; zusätzliche parallele mobile Wiederholungen bestanden nach der Korrektur der Ladereihenfolge.
+
+Die Lupe im Kopfbereich führt von einer Produktseite direkt ins fokussierte Katalog-Suchfeld. Im Katalog bleiben vorhandene Filter beim Öffnen der Suche erhalten. Die Lupe am Eingabefeld ist ein 44 × 44 Pixel großer Suchknopf: Klick und Enter führen zur Trefferzahl, eine leere Suche fokussiert das Eingabefeld. Die Live-Suche und die Swipe-Bewegung ihrer Ergebnisse bleiben erhalten. Deutsch und Englisch, leere Trefferlisten, Tastaturfokus und schmale Ansichten sind geprüft; die aktualisierte Suche wurde zusätzlich in der eingebetteten Vorschau visuell kontrolliert.
 
 Produktbilder wechseln mit einem vollständigen horizontalen Swipe (360 ms), über Vorschaubilder, Pfeiltasten und Touchgesten. Eine Mauslupe vergrößert den Bereich unter dem Zeiger um den Faktor 2,5. In der Vollbildansicht lässt sich die Vergrößerung per Button oder Tippen aktivieren und per Ziehen oder Pfeiltasten verschieben. Hover-Pfeile und Mauslupe schieben sich herein (280 ms); die Pfeile bleiben auf Touchgeräten sichtbar. Akkordeons schieben ihren Inhalt beim Öffnen und Schließen vertikal und passen die Höhe an (340 ms). Schnelle Richtungswechsel bleiben bedienbar.
 
