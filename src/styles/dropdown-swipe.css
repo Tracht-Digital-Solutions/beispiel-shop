@@ -1,0 +1,71 @@
+/* Keep native selection, keyboard navigation, form values and dialog ownership. */
+@supports (appearance: base-select) {
+  select,
+  select::picker(select) {
+    appearance: base-select;
+  }
+
+  select::picker(select) {
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    padding: 4px;
+    max-block-size: min(320px, 50dvh);
+    max-inline-size: calc(100vw - 24px);
+    box-shadow: 0 10px 24px #22222218;
+    opacity: 1;
+    transform: translateY(-100%);
+    clip-path: inset(100% 0 0);
+    pointer-events: none;
+    transition:
+      transform 320ms cubic-bezier(0.22, 0.7, 0.25, 1),
+      clip-path 320ms cubic-bezier(0.22, 0.7, 0.25, 1),
+      display 320ms allow-discrete,
+      overlay 320ms allow-discrete;
+  }
+
+  select:open::picker(select) {
+    transform: translateY(0);
+    clip-path: inset(0);
+    pointer-events: auto;
+  }
+
+  @starting-style {
+    select:open::picker(select) {
+      transform: translateY(-100%);
+      clip-path: inset(100% 0 0);
+    }
+  }
+
+  select option {
+    min-block-size: 44px;
+    padding: 10px 12px;
+    gap: 10px;
+    font-size: 13px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  select option:checked {
+    background: #e8e8df;
+    font-weight: 600;
+  }
+
+  select option:hover,
+  select option:focus-visible {
+    background: var(--ink);
+    color: var(--paper);
+    outline: none;
+  }
+
+  select::picker-icon {
+    color: currentColor;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    select::picker(select) {
+      transition: none;
+    }
+  }
+}

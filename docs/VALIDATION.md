@@ -1,6 +1,6 @@
 # Prüfung und Abnahme
 
-Stand der Funktions- und Browserprüfungen: 12. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Screenshots und Performance-Messungen stammen vom 8. September 2026. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
+Stand der Funktions- und Browserprüfungen: 19. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Screenshots und Performance-Messungen stammen vom 8. September 2026. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
 
 ## Ergebnis
 
@@ -8,7 +8,7 @@ Stand der Funktions- und Browserprüfungen: 12. September 2026. Geprüft wurde d
 | ----------------------------------------- | -------------------------------------------------------------- |
 | Astro / TypeScript                        | 0 Fehler, 0 Warnungen                                          |
 | Vitest                                    | 34 Tests bestanden                                             |
-| Playwright Desktop + Mobil                | 76 Tests bestanden, 2 bewusst übersprungene Prüfungen          |
+| Playwright Desktop + Mobil                | 80 Tests bestanden, 2 bewusst übersprungene Prüfungen          |
 | Statischer Build                          | 46 Seiten erfolgreich erzeugt                                  |
 | Formatprüfung                             | Bestanden                                                      |
 | axe auf den geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
@@ -17,7 +17,7 @@ Die 320- und 834-Pixel-Prüfung wird einmal im Desktop-Testprojekt ausgeführt; 
 
 Ein zusätzlicher Test hält das Laden der Produktbedienung gezielt an: Bildzoom, Bildwechsel, Farbe, Größe und Größenhilfe bleiben währenddessen deaktiviert. Nach dem Laden funktionieren Bildzoom und Größenauswahl unmittelbar; ein früher Klick kann nicht mehr vor dem Aktivieren der Bedienung verloren gehen.
 
-Der lokale Abschlusslauf am 12. September verwendete Port 4327, weil Port 4321 durch ein anderes Projekt belegt war. Eine lokale Konfigurationsdatei änderte ausschließlich Vorschau-Adresse, Test- und Ausgabeordner; Browserprofile, Prüfungen und vier parallele Prozesse blieben erhalten. In GitHub Actions gilt weiterhin die reguläre Konfiguration mit Port 4321.
+Der lokale Abschlusslauf am 19. September verwendete die reguläre Playwright-Konfiguration mit Port 4321 und vier parallelen Prozessen.
 
 ## Funktionsumfang der Prüfung
 
@@ -52,6 +52,8 @@ Kategorie-Wechsel schieben die Produktgruppe entsprechend der Registerkarten-Rei
 Aktive Filter-Tags fahren beim Entfernen und Zurücksetzen seitlich hinaus (260 ms). URL und Filterwirkung ändern sich sofort; die ausfahrenden Tags sind nicht mehr bedienbar. Erneutes Auswählen während der Bewegung verwirft den alten Ausgang, ohne den neuen Filter zu entfernen. Nach dem Wegklicken erhält das Suchfeld den Fokus. Deutsch, Englisch und eine während der Bewegung aktivierte Bewegungsreduktion sind geprüft.
 
 Der Produktfilter fährt von unten herein und beim Schließen vollständig nach unten hinaus (je 380 ms). Das gilt für Schließen-Button, Ergebnis-Button, Escape und Hintergrundklick; Klicks auf den Innenabstand lassen ihn geöffnet. Dialogfokus und modaler Zustand bleiben bis zum Ende der Ausgangsbewegung erhalten, danach kehrt der Fokus zum Öffner zurück. Bildansicht und Größenhilfe bewegen sich von unterhalb des Bildschirms in ihre zentrierte Position (420 ms). Bei `prefers-reduced-motion: reduce` erfolgen die Zustandswechsel unmittelbar. Automatisierte Prüfungen decken die Bewegungen einschließlich Fokus, letzten Warenkorbartikel, schnelle Bild- und Akkordeonwechsel, Mauslupe, Touchgesten und reduzierte Bewegung ab.
+
+Die Auswahlmenüs für Sortierung, Größe, Farbe, Preis und Lieferland verwenden eine vollständige vertikale Ein- und Ausschubbewegung (320 ms) ohne Änderung der Deckkraft. Die [anpassbaren nativen Select-Menüs](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Customizable_select) behalten die integrierte Auswahl, Tastaturbedienung und Formularwerte. Auswahl und Escape schließen das Menü; innerhalb des mobilen Filters bleibt der umgebende Dialog geöffnet. Reduzierte Bewegung deaktiviert die Übergänge, auch während einer laufenden Bewegung. Browser ohne `appearance: base-select` behalten ihr natives Auswahlmenü ohne Swipe. Die neuen Prüfungen decken Zwischenbilder beim Öffnen und Schließen, konstante Deckkraft, Tastaturauswahl, URL-Aktualisierung und Bewegungsreduktion auf Deutsch und Englisch ab. Die Dropdown-Darstellung wurde zusätzlich in der eingebetteten Vorschau kontrolliert.
 
 ## Reproduzierbare Labormessung
 
