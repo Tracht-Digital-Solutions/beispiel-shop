@@ -19,6 +19,57 @@ async function holdDeparture(owner: Locator, state: string) {
 }
 
 for (const locale of ['de', 'en'] as const) {
+  test(`${locale}: added tags swipe in at full width and interrupted arrivals settle correctly`, async ({
+    page,
+  }) => {
+    await page.goto(`/${locale}/shop/`);
+    await expect(page.locator('.catalog')).toHaveAttribute('data-ready', 'true');
+    const chips = page.locator('.filter-chips');
+    await chips.evaluate((node) => {
+      const observer = new MutationObserver(() => {
+        const buttons = node.querySelectorAll('button');
+        if (!buttons.length) return;
+        buttons.forEach((button) =>
+          button.getAnimations().forEach((animation) => {
+            animation.pause();
+            animation.currentTime = 0;
+          }),
+        );
+        observer.disconnect();
+      });
+      observer.observe(node, { childList: true, subtree: true });
+    });
+    const search = page.getByRole('searchbox');
+    await search.fill('Studio');
+    const query = chips.locator('[data-filter="q"]');
+    const arrival = await query.locator('button').evaluate((node) => ({
+      x: new DOMMatrix(getComputedStyle(node).transform).m41,
+      width: node.getBoundingClientRect().width,
+      opacity: getComputedStyle(node).opacity,
+    }));
+    expect(arrival.x).toBeGreaterThan(arrival.width);
+    expect(arrival.opacity).toBe('1');
+    await expect(page).toHaveURL(/q=Studio/);
+    // Removing before entry finishes must cancel entry, then allow a fresh addition.
+    await search.fill('');
+    await expect(query).toHaveCount(0);
+    await search.fill('Studio');
+    await expect(query).toHaveCount(1);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect
+      .poll(() =>
+        query
+          .locator('button')
+          .evaluate((node) => new DOMMatrix(getComputedStyle(node).transform).m41),
+      )
+      .toBe(0);
+    await query.getByRole('button').click();
+    await expect(query).toHaveCount(0);
+    await expect(search).toBeFocused();
+    await search.fill('Studio');
+    expect(await query.locator('button').evaluate((node) => node.getAnimations().length)).toBe(0);
+  });
+
   test(`${locale}: removing chips updates filters immediately and re-adding cancels the old exit`, async ({
     page,
   }) => {

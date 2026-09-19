@@ -20,18 +20,29 @@ function ChipButton({
   onExit: (id: Chip['id'], version: number) => void;
 }) {
   const button = useRef<HTMLButtonElement>(null);
+  const interruptedTransform = useRef<string | null>(null);
   const { id, exiting, version } = chip;
   useLayoutEffect(() => {
-    if (!exiting || !button.current) return;
+    if (!button.current) return;
+    const element = button.current;
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (preference.matches || !button.current.animate) {
-      onExit(id, version);
+      interruptedTransform.current = null;
+      if (exiting) onExit(id, version);
       return;
     }
-    const animation = button.current.animate(
-      [{ transform: 'none' }, { transform: 'translateX(-110%)' }],
-      { duration: 260, easing: 'cubic-bezier(0.22, 0.7, 0.25, 1)', fill: 'forwards' },
+    const animation = element.animate(
+      [
+        { transform: interruptedTransform.current ?? (exiting ? 'none' : 'translateX(110%)') },
+        { transform: exiting ? 'translateX(-110%)' : 'none' },
+      ],
+      {
+        duration: exiting ? 260 : 320,
+        easing: 'cubic-bezier(0.22, 0.7, 0.25, 1)',
+        fill: 'forwards',
+      },
     );
+    interruptedTransform.current = null;
     let cancelled = false;
     const reduce = () => {
       if (preference.matches) animation.finish();
@@ -39,13 +50,14 @@ function ChipButton({
     preference.addEventListener('change', reduce);
     animation.finished
       .then(() => {
-        if (!cancelled) onExit(id, version);
+        if (!cancelled && exiting) onExit(id, version);
       })
       .catch(() => {
         /* Re-adding a filter cancels its old departure. */
       });
     return () => {
       cancelled = true;
+      interruptedTransform.current = getComputedStyle(element).transform;
       preference.removeEventListener('change', reduce);
       animation.cancel();
     };
