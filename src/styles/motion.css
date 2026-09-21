@@ -1,11 +1,47 @@
-/* Motion owns transforms; native snapshots never cross-fade. */
+/* Both viewport snapshots share one clock and curve, with touching edges. */
+::view-transition-group(root) {
+  animation: none;
+  width: 100%;
+  height: 100%;
+}
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: none !important;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
   mix-blend-mode: normal;
+  opacity: 1;
+  animation-duration: var(--page-slide-duration, 0.42s);
+  animation-timing-function: var(--page-slide-ease, cubic-bezier(0.22, 0.7, 0.25, 1));
+  animation-fill-mode: both;
 }
-::view-transition-group(root) {
-  animation: none !important;
+::view-transition-old(root) {
+  animation-name: page-slide-out;
+}
+::view-transition-new(root) {
+  animation-name: page-slide-in;
+}
+@keyframes page-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% * var(--page-slide-direction, 1)));
+  }
+}
+@keyframes page-slide-in {
+  from {
+    transform: translateX(calc(100% * var(--page-slide-direction, 1)));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }
 html {
   overflow-x: clip;

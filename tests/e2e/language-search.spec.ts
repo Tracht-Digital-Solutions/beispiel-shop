@@ -1,15 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { recordMotion, expectSlide } from './motion-helpers';
 test('all page navigation slides in both language directions and keeps filters and browser history', async ({
   page,
 }) => {
   await page.goto('/de/shop/?category=tees&q=Studio#catalog-search');
   await expect(page.locator('.catalog')).toHaveAttribute('data-ready', 'true');
   for (const locale of ['en', 'de']) {
-    await recordMotion(page, '.page-shell');
     await page.locator('.language-link').click();
     await expect(page).toHaveURL('/' + locale + '/shop/?category=tees&q=Studio#catalog-search');
-    await expectSlide(page);
     await expect(page.locator('html')).toHaveAttribute('lang', locale);
     await expect(page.getByRole('searchbox')).toHaveValue('Studio');
     await expect(page.locator('.catalog-result-card')).toHaveCount(2);

@@ -3,7 +3,7 @@ import type {
   TransitionBeforePreparationEvent,
   TransitionBeforeSwapEvent,
 } from 'astro:transitions/client';
-import { reducedMotion, slideElement, timing } from './motion';
+import { ease, reducedMotion, slideElement, timing } from './motion';
 import { $cartOpen } from './cart';
 
 // Safari does not focus pointer-activated buttons by default. Keep dialog return
@@ -23,22 +23,14 @@ document.addEventListener(
   true,
 );
 
-let cancelPage: (() => void) | undefined;
+let activeTransition: TransitionBeforeSwapEvent['viewTransition'] | undefined;
 let cleanupReveals = () => {};
-let direction = 1;
+
 document.addEventListener('astro:before-preparation', (event) => {
   const navigation = event as TransitionBeforePreparationEvent;
   const loader = navigation.loader;
-  cancelPage?.();
-  const shell = document.querySelector<HTMLElement>('.page-shell');
-  if (shell) {
-    shell.style.transform = '';
-    shell.style.pointerEvents = '';
-  }
-  direction = navigation.direction === 'back' ? -1 : 1;
-  const fromLocale = navigation.from.pathname.split('/')[1];
-  const toLocale = navigation.to.pathname.split('/')[1];
-  if (fromLocale !== toLocale) direction = toLocale === 'en' ? 1 : -1;
+  activeTransition?.skipTransition();
+  // Keep the current page visible while the destination is prepared.
   const dialogsClosed = Promise.all(
     Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).map(
       (dialog) =>
@@ -55,58 +47,39 @@ document.addEventListener('astro:before-preparation', (event) => {
     ),
   );
   navigation.loader = async () => {
-    try {
-      await Promise.all([loader(), dialogsClosed]);
-      if (navigation.signal.aborted || !shell) return;
-      cleanupReveals();
-      shell.style.pointerEvents = 'none';
-      await new Promise<void>((resolve) => {
-        const abort = () => {
-          cancelPage?.();
-          shell.style.transform = '';
-          shell.style.pointerEvents = '';
-          resolve();
-        };
-        navigation.signal.addEventListener('abort', abort, { once: true });
-        cancelPage = slideElement(
-          shell,
-          getComputedStyle(shell).transform,
-          `translateX(${-direction * 100}vw)`,
-          timing.page,
-          () => {
-            navigation.signal.removeEventListener('abort', abort);
-            resolve();
-          },
-        );
-      });
-    } catch (error) {
-      if (shell) {
-        shell.style.transform = '';
-        shell.style.pointerEvents = '';
-      }
-      throw error;
-    }
+    await Promise.all([loader(), dialogsClosed]);
   };
 });
+
 document.addEventListener('astro:before-swap', (event) => {
   const navigation = event as TransitionBeforeSwapEvent;
-  // Skipping native snapshots rejects ready in WebKit; Motion owns the visual transition.
-  navigation.viewTransition.ready.catch(() => {});
-  navigation.viewTransition.skipTransition();
+  const transition = navigation.viewTransition;
+  activeTransition = transition;
+  // Skipping or superseding a transition can reject ready in WebKit.
+  transition.ready.catch(() => {});
+  cleanupReveals();
   $cartOpen.set(false);
-  navigation.newDocument
-    .querySelector<HTMLElement>('.page-shell')
-    ?.style.setProperty('transform', reducedMotion() ? 'none' : `translateX(${direction * 100}vw)`);
+  let direction = navigation.direction === 'back' ? -1 : 1;
+  const fromLocale = navigation.from.pathname.split('/')[1];
+  const toLocale = navigation.to.pathname.split('/')[1];
+  if (fromLocale !== toLocale) direction = toLocale === 'en' ? 1 : -1;
+  const root = navigation.newDocument.documentElement;
+  root.style.setProperty('--page-slide-direction', String(direction));
+  root.style.setProperty('--page-slide-duration', timing.page + 's');
+  root.style.setProperty('--page-slide-ease', 'cubic-bezier(' + ease.join(',') + ')');
+  const preference = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduce = () => {
+    if (preference.matches) transition.skipTransition();
+  };
+  preference.addEventListener('change', reduce);
+  reduce();
+  const done = () => {
+    preference.removeEventListener('change', reduce);
+    if (activeTransition === transition) activeTransition = undefined;
+  };
+  transition.finished.then(done, done);
 });
-document.addEventListener('astro:after-swap', () => {
-  const shell = document.querySelector<HTMLElement>('.page-shell');
-  if (!shell) return;
-  shell.style.pointerEvents = 'none';
-  cancelPage = slideElement(shell, shell.style.transform, 'none', timing.page, () => {
-    shell.style.transform = '';
-    shell.style.pointerEvents = '';
-  });
-});
+
 document.addEventListener('astro:page-load', () => {
   cleanupReveals();
   const cleanup: (() => void)[] = [];

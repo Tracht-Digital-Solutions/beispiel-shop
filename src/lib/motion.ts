@@ -1,7 +1,7 @@
 import { animate } from 'motion/mini';
 
 export const ease = [0.22, 0.7, 0.25, 1] as const;
-export const timing = { small: 0.28, content: 0.36, panel: 0.42, page: 0.24 };
+export const timing = { small: 0.28, content: 0.36, panel: 0.42, page: 0.42 };
 export const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** One owner per element; interruption keeps the visible frame. */

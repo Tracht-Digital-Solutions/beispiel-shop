@@ -1,19 +1,25 @@
 # Prüfung und Abnahme
 
-Stand: 20. September 2026. Produktionsbuild unter Windows mit Node.js 24, Chromium 153, Firefox 155 und WebKit 26.6. GitHub Actions prüft zusätzlich unter Ubuntu; aktuelle Ergebnisse stehen unter [Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions).
+Stand: 21. September 2026. Produktionsbuild unter Windows mit Node.js 24, Chromium 153, Firefox 155 und WebKit 26.6. GitHub Actions prüft zusätzlich unter Ubuntu; aktuelle Ergebnisse stehen unter [Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions).
 
 ## Ergebnis
 
 | Prüfung | Ergebnis |
 | --- | --- |
-| Astro / TypeScript | 56 Dateien, 0 Fehler, 0 Warnungen |
+| Astro / TypeScript | 57 Dateien, 0 Fehler, 0 Warnungen |
 | Vitest | 34 Tests bestanden |
-| Playwright | 172 bestanden, 4 bewusst übersprungen |
+| Playwright | 187 direkt bestanden, 1 im Wiederholungslauf bestanden, 4 bewusst übersprungen |
 | Statischer Build | 46 Seiten |
 | Formatprüfung | Bestanden |
 | axe auf geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
 
 Vier Browserprojekte prüfen Desktop-Chromium, Pixel-7-Emulation, Firefox und WebKit. Der Touch-Test läuft nur im mobilen Projekt (drei übersprungene Desktop-Fälle); die zusätzliche 320-/834-Pixel-Prüfung wird im mobilen Projekt nicht doppelt ausgeführt. Emulation ersetzt keine Prüfung auf physischen Geräten.
+
+Der vollständige lokale Lauf umfasst jetzt 192 Fälle. Ein vorhandener Firefox-Sortiertest schlug einmal fehl; der anschließende dreifache Lauf der betroffenen Testdatei bestand mit 9/9 Fällen. Die GitHub-Pipelines prüfen den finalen Quellstand erneut.
+
+## Lückenloser Seitenwechsel
+
+Die Seitenansichten bewegen sich gleichzeitig über 420 ms. Zusätzliche Tests prüfen ihre aneinander anschließenden Kanten bei 25 %, 50 % und 75 %, konstante Deckkraft, beide Sprachrichtungen, langsames Laden ohne vorzeitigen Ausgang, neue Navigation während einer ausstehenden Anfrage, Scroll-Wiederherstellung sowie Bewegungsreduktion während eines Slides und den Fallback ohne View-Transition-API. Alle 16 neuen Fälle in vier Browserprojekten bestanden. Die bisherigen Leistungsberichte stammen vom 20. September und werden nicht als neue Messung dieser Snapshot-Umstellung ausgewiesen.
 
 ## Funktionen und Bewegung
 

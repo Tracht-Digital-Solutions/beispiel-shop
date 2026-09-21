@@ -1,10 +1,10 @@
 # Bewegungsdesign mit Motion
 
-Stand: 20. September 2026. Alle Übergänge sind gerichtete Slides mit unveränderter Deckkraft. Keine Federn, kein Nachschwingen und keine animierten Button-Impulse.
+Stand: 21. September 2026. Alle Übergänge sind gerichtete Slides mit unveränderter Deckkraft. Keine Federn, kein Nachschwingen und keine animierten Button-Impulse.
 
 ## Gemeinsame Regeln
 
-`src/lib/motion.ts` definiert die Kurve `[0.22, 0.7, 0.25, 1]` und die Zeitstufen: 280 ms für kleine Menüs und Hover-Inhalte, 360 ms für Inhalte, 420 ms für Dialoge und Scroll-Einstiege. Seiten fahren nach dem Laden des Ziels 240 ms hinaus und 240 ms herein. Bewegungen nutzen vollständige Element- oder Bildschirmbreiten/-höhen.
+`src/lib/motion.ts` definiert die Kurve `[0.22, 0.7, 0.25, 1]` und die Zeitstufen: 280 ms für kleine Menüs und Hover-Inhalte, 360 ms für Inhalte, 420 ms für Dialoge und Scroll-Einstiege. Seiten wechseln nach dem Laden des Ziels in einem gleichzeitigen Slide von 420 ms. Bewegungen nutzen vollständige Element- oder Bildschirmbreiten/-höhen.
 
 - React-Inseln verwenden `LazyMotion`, `m`, `AnimatePresence` und `layout="position"`. Äußere Elemente verantworten die Position, innere Elemente den Slide. Dadurch konkurrieren Layout- und Inhaltsbewegungen nicht um denselben Transform.
 - Filter-Tags und Produktkarten bleiben für ihren Ausgang über `usePresence` erhalten. Die tatsächliche Motion-Animation gibt ihre Entfernung frei; es gibt keinen unabhängigen Entfernungstimer. Aktive Filter, Trefferzahl, URL und Warenkorbwerte ändern sich sofort.
@@ -17,7 +17,7 @@ Stand: 20. September 2026. Alle Übergänge sind gerichtete Slides mit unveränd
 
 ## Navigation und Scrollen
 
-Astros `ClientRouter` lädt weiterhin statische Seiten. Vor dem Austausch fährt die gesamte Seitenschale einschließlich Kopf- und Fußbereich hinaus. Danach fährt die neue Schale herein. Native Snapshot-Überblendungen sind abgeschaltet; Chromium, Firefox und WebKit erhalten dieselben Motion-Slides. Zurücknavigation und EN→DE verwenden die umgekehrte Richtung. Modifizierte Links, externe Ziele und Anker behalten ihre normalen Funktionen.
+Astros `ClientRouter` lädt weiterhin statische Seiten. Während der Vorbereitung bleibt die alte Seite vollständig sichtbar. Native View-Transition-Snapshots verschieben danach die alte und neue gesamte Ansicht gleichzeitig um eine Bildschirmbreite. Beide verwenden dieselbe Dauer und Kurve, volle Deckkraft und aneinander anschließende Kanten. Dadurch gibt es keine leere Phase zwischen Ausgang und Eingang. Header und Footer gehören zum Snapshot; zusätzliche interaktive DOM-Kopien werden nicht angelegt. Chromium, Firefox und WebKit sind mit Zwischenbildern bei 25 %, 50 % und 75 % geprüft. Zurücknavigation und EN→DE verwenden die umgekehrte Richtung. Modifizierte Links, externe Ziele und Anker behalten ihre normalen Funktionen. Ohne View-Transition-Unterstützung oder bei reduzierter Bewegung erfolgt ein direkter Austausch. Eine neue Navigation beendet den bisherigen Snapshot-Übergang; ein Wechsel der Bewegungseinstellung beendet auch eine laufende Animation.
 
 Filteränderungen erhalten Astros History-Metadaten. Der gemeinsame Warenkorb bleibt auch bei clientseitigem Sprach-/Seitenwechsel im Speicher erhalten. Sind beide Browserspeicher gesperrt, geht er erst beim vollständigen Neuladen oder Verlassen des Tabs verloren; der Hinweis beschreibt dieses Verhalten.
 
