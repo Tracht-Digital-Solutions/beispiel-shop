@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-20T15:02:20.133Z",
+  "browser": "153.0.8010.12",
+  "viewport": "1440x960",
+  "throttling": "none",
+  "durationPerInteractionMs": 1000,
+  "samples": [
+    {
+      "name": "search",
+      "frames": 60,
+      "medianMs": 16.69999999999999,
+      "p95Ms": 16.700000000000045,
+      "maxMs": 16.800000000000182,
+      "framesOver50Ms": 0
+    },
+    {
+      "name": "reset",
+      "frames": 60,
+      "medianMs": 16.700000000000045,
+      "p95Ms": 16.799999999999727,
+      "maxMs": 16.800000000000182,
+      "framesOver50Ms": 0
+    },
+    {
+      "name": "category",
+      "frames": 60,
+      "medianMs": 16.699999999999818,
+      "p95Ms": 16.700000000000273,
+      "maxMs": 16.799999999999727,
+      "framesOver50Ms": 0
+    },
+    {
+      "name": "language",
+      "frames": 60,
+      "medianMs": 16.699999999999818,
+      "p95Ms": 16.700000000000273,
+      "maxMs": 16.800000000000182,
+      "framesOver50Ms": 0
+    }
+  ]
+}

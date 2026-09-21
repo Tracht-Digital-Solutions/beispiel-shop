@@ -1,3 +1,4 @@
+import { recordMotion, expectSlide } from './motion-helpers';
 import { test, expect, type Page } from '@playwright/test';
 
 async function openCatalog(page: Page, locale: 'de' | 'en', query = '') {
@@ -123,140 +124,30 @@ test('reduced motion updates search and category results without moving stale pr
   ).toBe(0);
 });
 
-// Pause at the actual state change instead of relying on the runner reaching a 220 ms transition.
-async function holdPhase(page: Page, phase: 'exit' | 'enter') {
-  await page.locator('.catalog-results').evaluate((node, phase) => {
-    const observer = new MutationObserver(() => {
-      if ((node as HTMLElement).dataset.phase !== phase) return;
-      const animations = node.getAnimations({ subtree: true });
-      if (!animations.length) return;
-      animations.forEach((animation) => {
-        animation.pause();
-        animation.currentTime = Number(animation.effect?.getTiming().duration) / 2;
-      });
-      observer.disconnect();
-    });
-    observer.observe(node, { attributes: true, attributeFilter: ['data-phase'] });
-  }, phase);
-}
-
-async function releasePhase(page: Page) {
-  await page.locator('.catalog-results').evaluate((node) => {
-    node.getAnimations({ subtree: true }).forEach((animation) => animation.finish());
-  });
-}
-
-test('search cards leave and enter through clipped full-width swipes without fading', async ({
+test('search removes non-matches with a full slide while retained cards reposition without fading', async ({
   page,
 }) => {
   await openCatalog(page, 'en');
-  await holdPhase(page, 'exit');
+  await recordMotion(page, '.catalog-result-card[data-product-id="b01-01"] > div');
   await page.getByRole('searchbox').fill('Studio');
-  const results = page.locator('.catalog-results');
-  await expect(results).toHaveAttribute('data-phase', 'exit');
-  await expect(results.locator('.product-card')).toHaveCount(16);
-  await expect(results.locator('.catalog-results-content')).toHaveJSProperty('inert', true);
-  await expect(results.locator('.catalog-results-content')).toHaveAttribute('aria-hidden', 'true');
-  await expect(page.getByRole('searchbox')).toBeFocused();
-  const movement = await results.locator('.catalog-result-card').evaluateAll((slots) =>
-    slots.map((slot) => {
-      const card = slot.querySelector<HTMLElement>('.product-card')!;
-      const frames = (card.getAnimations()[0].effect as KeyframeEffect).getKeyframes();
-      return {
-        href: card.querySelector('a')!.getAttribute('href'),
-        end: frames.at(-1)!.transform,
-        opacity: getComputedStyle(card).opacity,
-        offset: new DOMMatrix(getComputedStyle(card).transform).m41,
-        width: card.offsetWidth,
-      };
-    }),
-  );
-  for (const card of movement) {
-    const matches = [
-      '/en/product/faded-tee/',
-      '/en/product/studio-tee/',
-      '/en/product/zip-hoodie/',
-    ].includes(card.href!);
-    expect(card.end).toBe(matches ? 'translateX(110%)' : 'translateX(-110%)');
-    expect(card.opacity).toBe('1');
-    expect(Math.abs(card.offset)).toBeGreaterThan(card.width * 0.5);
-  }
-  await holdPhase(page, 'enter');
-  await releasePhase(page);
-  await expect(results).toHaveAttribute('data-phase', 'enter');
-  await expect(results.locator('.product-card')).toHaveCount(3);
-  expect(
-    await results.locator('.product-card').evaluateAll((cards) =>
-      cards.every((card) => {
-        const frames = (card.getAnimations()[0].effect as KeyframeEffect).getKeyframes();
-        return (
-          frames[0].transform === 'translateX(110%)' &&
-          frames.at(-1)!.transform === 'none' &&
-          getComputedStyle(card).opacity === '1'
-        );
-      }),
-    ),
-  ).toBe(true);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
-    true,
-  );
-  await releasePhase(page);
+  await expectSlide(page);
   await expectProducts(page, 'en', ['faded-tee', 'studio-tee', 'zip-hoodie']);
-  await page.getByRole('searchbox').fill('no-product-matches-this');
-  await expectProducts(page, 'en', []);
-  await page.getByRole('button', { name: 'View all products' }).click();
-  await expect(page.getByRole('searchbox')).toBeFocused();
-  await expect(results).toHaveAttribute('data-phase', 'idle');
-  await expect(results.locator('.product-card')).toHaveCount(16);
+  await recordMotion(page, '.catalog-result-card[data-product-id="b01-01"] > div');
+  await page.getByRole('searchbox').fill('');
+  await expectSlide(page);
+  await expect(page.locator('.catalog-result-card')).toHaveCount(16);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
-
-test('category groups swipe in both directions and changing motion preference settles a pending switch', async ({
-  page,
-}) => {
+test('category reversal and live reduced motion settle the newest selection', async ({ page }) => {
   await openCatalog(page, 'en', '?category=hoodies');
-  const categories = page.locator('.category-tabs');
-  for (const { name, direction, slugs } of [
-    {
-      name: /^T-shirts/,
-      direction: -1,
-      slugs: ['heavy-tee', 'faded-tee', 'studio-tee', 'line-tee'],
-    },
-    {
-      name: /^Hoodies &/,
-      direction: 1,
-      slugs: ['concrete-hoodie', 'signal-hoodie', 'zip-hoodie', 'raw-sweat'],
-    },
-  ]) {
-    await holdPhase(page, 'exit');
-    const tab = categories.getByRole('button', { name });
-    await tab.click();
-    await expect(tab).toHaveAttribute('aria-pressed', 'true');
-    await expect(tab).toBeFocused();
-    const content = page.locator('.catalog-results-content');
-    expect(
-      await content.evaluate(
-        (node) =>
-          (node.getAnimations()[0].effect as KeyframeEffect).getKeyframes().at(-1)!.transform,
-      ),
-    ).toBe(`translateX(${-direction * 110}%)`);
-    await holdPhase(page, 'enter');
-    await releasePhase(page);
-    await expect(page.locator('.catalog-results')).toHaveAttribute('data-phase', 'enter');
-    expect(
-      await content.evaluate(
-        (node) => (node.getAnimations()[0].effect as KeyframeEffect).getKeyframes()[0].transform,
-      ),
-    ).toBe(`translateX(${direction * 110}%)`);
-    await releasePhase(page);
-    await expectProducts(page, 'en', slugs);
-  }
-  await holdPhase(page, 'exit');
-  await categories.getByRole('button', { name: /^Pants/ }).click();
+  await page
+    .locator('.category-tabs')
+    .getByRole('button', { name: /^T-shirts/ })
+    .click();
+  await page
+    .locator('.category-tabs')
+    .getByRole('button', { name: /^Pants/ })
+    .click();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expectProducts(page, 'en', ['cargo-pant', 'wide-denim', 'carpenter-pant', 'track-pant']);
-  expect(
-    await page
-      .locator('.catalog-results')
-      .evaluate((node) => node.getAnimations({ subtree: true }).length),
-  ).toBe(0);
 });

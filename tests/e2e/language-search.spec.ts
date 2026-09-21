@@ -1,107 +1,30 @@
-import { test, expect, type Page } from '@playwright/test';
-
-type MotionWindow = Window & {
-  languageMotions?: { name: string; frames: Keyframe[] }[];
-  languageMotionError?: string;
-};
-
-async function holdLanguageSwipe(page: Page) {
-  await page.addInitScript(() => {
-    (window as MotionWindow).languageMotions = [];
-    window.addEventListener('pagereveal', (event) => {
-      const transition = (event as PageRevealEvent).viewTransition;
-      if (!transition)
-        (window as MotionWindow).languageMotionError = 'No native transition was created';
-      transition?.ready
-        .then(() => {
-          const motions = document
-            .getAnimations()
-            .filter(
-              (animation) =>
-                animation instanceof CSSAnimation &&
-                animation.animationName.startsWith('language-'),
-            );
-          (window as MotionWindow).languageMotions = motions.map((animation) => ({
-            name: (animation as CSSAnimation).animationName,
-            frames: (animation.effect as KeyframeEffect).getKeyframes(),
-          }));
-          motions.forEach((animation) => {
-            animation.pause();
-            animation.currentTime = 180;
-          });
-        })
-        .catch((error) => {
-          (window as MotionWindow).languageMotionError = String(error);
-        });
-    });
-  });
-}
-
-async function releaseLanguageSwipe(page: Page) {
-  await page.evaluate(() =>
-    document
-      .getAnimations()
-      .filter(
-        (animation) =>
-          animation instanceof CSSAnimation && animation.animationName.startsWith('language-'),
-      )
-      .forEach((animation) => animation.finish()),
-  );
-  await expect(page.locator('html')).not.toHaveAttribute('data-language-swipe');
-  // Let the browser dispose the manually-finished snapshot before another navigation.
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-      ),
-  );
-}
-
-test('the whole page swipes in both language directions while preserving the route and filters', async ({
+import { test, expect } from '@playwright/test';
+import { recordMotion, expectSlide } from './motion-helpers';
+test('all page navigation slides in both language directions and keeps filters and browser history', async ({
   page,
-}, testInfo) => {
-  await holdLanguageSwipe(page);
+}) => {
   await page.goto('/de/shop/?category=tees&q=Studio#catalog-search');
   await expect(page.locator('.catalog')).toHaveAttribute('data-ready', 'true');
-  for (const { locale, direction, names } of [
-    { locale: 'en', direction: 'forward', names: ['language-in-right', 'language-out-left'] },
-    { locale: 'de', direction: 'backward', names: ['language-in-left', 'language-out-right'] },
-  ]) {
+  for (const locale of ['en', 'de']) {
+    await recordMotion(page, '.page-shell');
     await page.locator('.language-link').click();
-    await expect(page).toHaveURL(`/${locale}/shop/?category=tees&q=Studio#catalog-search`);
+    await expect(page).toHaveURL('/' + locale + '/shop/?category=tees&q=Studio#catalog-search');
+    await expectSlide(page);
     await expect(page.locator('html')).toHaveAttribute('lang', locale);
-    await expect
-      .poll(() =>
-        page.evaluate(() => ({
-          names: (window as MotionWindow).languageMotions?.map((motion) => motion.name).sort(),
-          error: (window as MotionWindow).languageMotionError,
-        })),
-      )
-      .toEqual({ names, error: undefined });
-    await expect(page.locator('html')).toHaveAttribute('data-language-swipe', direction);
-    const motions = await page.evaluate(() => (window as MotionWindow).languageMotions!);
-    expect(
-      motions.every((motion) =>
-        motion.frames.every((frame) => frame.opacity === undefined || Number(frame.opacity) === 1),
-      ),
-    ).toBe(true);
-    await expect(page.locator('.catalog')).toHaveAttribute('data-ready', 'true');
     await expect(page.getByRole('searchbox')).toHaveValue('Studio');
-    await expect(page.locator('.catalog-results .product-card')).toHaveCount(2);
-    if (locale === 'en') await page.screenshot({ path: testInfo.outputPath('language-swipe.png') });
-    await releaseLanguageSwipe(page);
+    await expect(page.locator('.catalog-result-card')).toHaveCount(2);
+    await expect(page.locator('.page-shell')).toHaveCSS('transform', 'none');
   }
-  await page.locator('.product-image-link').first().click();
+  await page.locator('.catalog-result-card .product-image-link').first().click();
   await expect(page).toHaveURL('/de/product/faded-tee/');
-  await expect(page.locator('html')).not.toHaveAttribute('data-language-swipe');
-  expect(await page.evaluate(() => (window as MotionWindow).languageMotions)).toEqual([]);
+  await page.goBack();
+  await expect(page.getByRole('searchbox')).toHaveValue('Studio');
 });
-
 test('reduced-motion language changes retain the bag without a page animation', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await holdLanguageSwipe(page);
+
   await page.goto('/de/product/heavy-tee/');
   await page.getByRole('button', { name: 'M', exact: true }).click();
   await page.getByRole('button', { name: 'In den Warenkorb', exact: true }).click();
@@ -110,7 +33,7 @@ test('reduced-motion language changes retain the bag without a page animation', 
   await expect(page).toHaveURL('/en/product/heavy-tee/');
   await expect(page.locator('.cart-number')).toHaveText('01');
   await expect(page.locator('html')).not.toHaveAttribute('data-language-swipe');
-  expect(await page.evaluate(() => (window as MotionWindow).languageMotions)).toEqual([]);
+  await expect(page.locator('.page-shell')).toHaveCSS('transform', 'none');
 });
 
 for (const locale of ['de', 'en'] as const) {

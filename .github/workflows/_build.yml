@@ -69,8 +69,8 @@ jobs:
           BUILD_CHANNEL: ${{ inputs.publish_branch || 'ci' }}
         run: node scripts/stamp-build.mjs
 
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Browser tests
         run: npm run test:e2e

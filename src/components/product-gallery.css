@@ -104,64 +104,33 @@
   font-size: 10px;
   line-height: 1.4;
 }
-@media (prefers-reduced-motion: no-preference) {
-  .product-magnifier {
-    animation: product-lens-in 280ms cubic-bezier(0.22, 0.7, 0.25, 1);
-  }
-  .product-gallery-main[data-sliding='true'] [data-gallery-current],
-  .product-zoom-view[data-sliding='true'] [data-gallery-current] {
-    animation: product-image-in-next 360ms cubic-bezier(0.22, 0.7, 0.25, 1) both;
-  }
-  .product-gallery-main[data-sliding='true'] .product-gallery-outgoing,
-  .product-zoom-view[data-sliding='true'] .product-gallery-outgoing {
-    animation: product-image-out-next 360ms cubic-bezier(0.22, 0.7, 0.25, 1) both;
-  }
-  .product-gallery-main[data-direction='previous'] [data-gallery-current],
-  .product-zoom-view[data-direction='previous'] [data-gallery-current] {
-    animation-name: product-image-in-previous;
-  }
-  .product-gallery-main[data-direction='previous'] .product-gallery-outgoing,
-  .product-zoom-view[data-direction='previous'] .product-gallery-outgoing {
-    animation-name: product-image-out-previous;
-  }
+
+.gallery-slides {
+  display: grid;
+  overflow: hidden;
+  width: 100%;
 }
-@keyframes product-lens-in {
-  from {
-    transform: translateX(calc(-100% - var(--lens-left)));
-  }
-  to {
-    transform: none;
-  }
+.gallery-slide {
+  grid-area: 1/1;
+  min-width: 0;
 }
-@keyframes product-image-in-next {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+.product-gallery-main .gallery-slide img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4/5;
+  object-fit: cover;
 }
-@keyframes product-image-out-next {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
-  }
+.product-zoom-view .gallery-slide img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100dvh - 126px);
+  object-fit: contain;
 }
-@keyframes product-image-in-previous {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-@keyframes product-image-out-previous {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(100%);
+@media (max-width: 600px) {
+  .product-gallery-main .gallery-slide img {
+    aspect-ratio: 4/4.6;
   }
 }

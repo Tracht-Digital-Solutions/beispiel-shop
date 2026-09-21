@@ -1,3 +1,9 @@
+import { useMotionPreference } from './useMotionPreference';
+import { AnimatePresence } from 'motion/react';
+import * as m from 'motion/react-m';
+import { MotionRoot } from './Motion';
+import { ease, timing } from '../lib/motion';
+import { useSlideDialog } from './useSlideDialog';
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Locale, Product } from '../lib/types';
 import { t } from '../lib/i18n';
@@ -16,6 +22,7 @@ export default function ProductGallery({
   locale: Locale;
   ready: boolean;
 }) {
+  const reduced = useMotionPreference();
   const images = useMemo(
     () =>
       [product.image, product.lifestyle].filter(
@@ -29,11 +36,12 @@ export default function ProductGallery({
     direction: 'next' | 'previous';
     id: number;
   } | null>(null);
-  const [open, setOpen] = useState(false);
+  const [, setOpen] = useState(false);
   const [zoomed, setZoomed] = useState(false);
   const [pan, setPan] = useState({ x: 50, y: 50 });
   const [lens, setLens] = useState<CSSProperties | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  useSlideDialog(dialogRef, 'center');
   const gesture = useRef<{
     x: number;
     y: number;
@@ -43,6 +51,7 @@ export default function ProductGallery({
   } | null>(null);
   const suppressNextClick = useRef(false);
   const slideId = useRef(0);
+  const imageDirection = useRef(1);
   const imageAlt =
     imageIndex === 0
       ? product.imageAlt[locale]
@@ -68,21 +77,13 @@ export default function ProductGallery({
     return () => preference.removeEventListener('change', finishSlide);
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = overflow;
-    };
-  }, [open]);
-
   function selectImage(
     next: number,
     direction: 'next' | 'previous' = next > imageIndex ? 'next' : 'previous',
   ) {
     const index = (next + images.length) % images.length;
     if (index === imageIndex) return;
+    imageDirection.current = direction === 'previous' ? -1 : 1;
     setLens(null);
     setZoomed(false);
     setPan({ x: 50, y: 50 });
@@ -202,33 +203,49 @@ export default function ProductGallery({
   }
 
   function renderImage(enlarged = false) {
+    const direction = imageDirection.current;
     return (
-      <>
-        {slide && (
-          <span
-            key={`outgoing-${slide.id}`}
-            className="product-gallery-outgoing"
-            style={{ backgroundImage: `url("${images[slide.previous]}")` }}
-            aria-hidden="true"
-          />
-        )}
-        <img
-          key={`${imageIndex}-${slide?.id ?? 'rest'}`}
-          data-gallery-current=""
-          src={images[imageIndex]}
-          alt={imageAlt}
-          fetchPriority={enlarged ? undefined : 'high'}
-          width={enlarged ? undefined : 900}
-          height={enlarged ? undefined : 1125}
-          style={enlarged ? { transformOrigin: `${pan.x}% ${pan.y}%` } : undefined}
-          draggable={false}
-          onAnimationEnd={(event) => {
-            if (event.animationName.startsWith('product-image-in-')) {
-              setSlide((current) => (current?.id === slide?.id ? null : current));
-            }
-          }}
-        />
-      </>
+      <MotionRoot>
+        <div className="gallery-slides">
+          <AnimatePresence initial={false} custom={direction}>
+            <m.div
+              key={imageIndex}
+              className="gallery-slide"
+              custom={direction}
+              variants={{
+                enter: (d: number) => ({ x: reduced ? 0 : d * 100 + '%' }),
+                current: { x: 0 },
+                exit: (d: number) => ({ x: reduced ? 0 : -d * 100 + '%' }),
+              }}
+              initial="enter"
+              animate="current"
+              exit="exit"
+              onAnimationComplete={() =>
+                setSlide((current) => (current?.id === slide?.id ? null : current))
+              }
+              transition={{ duration: reduced ? 0 : timing.content, ease }}
+            >
+              <img
+                data-gallery-current=""
+                src={images[imageIndex]}
+                alt={imageAlt}
+                fetchPriority={enlarged ? undefined : 'high'}
+                width={900}
+                height={1125}
+                style={
+                  enlarged
+                    ? {
+                        transformOrigin: pan.x + '% ' + pan.y + '%',
+                        transform: zoomed ? 'scale(2.5)' : 'none',
+                      }
+                    : undefined
+                }
+                draggable={false}
+              />
+            </m.div>
+          </AnimatePresence>
+        </div>
+      </MotionRoot>
     );
   }
 
@@ -268,7 +285,25 @@ export default function ProductGallery({
           )}
         >
           {renderImage()}
-          {lens && <span className="product-magnifier" style={lens} aria-hidden="true" />}
+          <MotionRoot>
+            <AnimatePresence>
+              {lens && (
+                <m.span
+                  className="product-magnifier"
+                  style={lens}
+                  aria-hidden="true"
+                  initial={{
+                    transform: reduced ? 'none' : 'translateX(calc(-100% - var(--lens-left)))',
+                  }}
+                  animate={{ transform: 'none' }}
+                  exit={{
+                    transform: reduced ? 'none' : 'translateX(calc(-100% - var(--lens-left)))',
+                  }}
+                  transition={{ duration: reduced ? 0 : timing.small, ease }}
+                />
+              )}
+            </AnimatePresence>
+          </MotionRoot>
           <span className="product-zoom-label">
             <svg
               width="17"

@@ -1,3 +1,4 @@
+import { choose } from './motion-helpers';
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 async function addTee(page: Page, locale = 'de') {
@@ -47,11 +48,11 @@ test('filters combine, persist in URL and reset from zero matches', async ({ pag
   await expect(page.locator('.product-card')).toHaveCount(16);
   if (testInfo.project.name === 'mobile') {
     await page.getByRole('button', { name: 'Filter +' }).click();
-    await page.locator('#mobile-color').selectOption('orange');
+    await choose(page, page.locator('#mobile-color'), 'orange');
     await page.getByRole('button', { name: '2 Produkte anzeigen' }).click();
-  } else await page.locator('#desktop-color').selectOption('orange');
+  } else await choose(page, page.locator('#desktop-color'), 'orange');
   await expect(page.locator('.product-card')).toHaveCount(2);
-  await page.getByRole('combobox', { name: 'Sortierung' }).selectOption('price-desc');
+  await choose(page, page.getByRole('combobox', { name: 'Sortierung' }), 'price-desc');
   await expect(page.locator('.product-card').first()).toContainText('Signal Hoodie');
 });
 for (const locale of ['de', 'en'])
@@ -140,7 +141,7 @@ test('blocked storage leaves the shopping flow usable', async ({ page }) => {
 });
 test('size guide and zoom dialogs support Escape and return focus', async ({ page }) => {
   await page.goto('/en/product/heavy-tee/');
-  const guide = page.getByRole('button', { name: 'Size guide' });
+  const guide = page.getByRole('button', { name: /^Size guide/ });
   await guide.click();
   await expect(page.locator('.product-guide-dialog')).toBeVisible();
   await page.keyboard.press('Escape');

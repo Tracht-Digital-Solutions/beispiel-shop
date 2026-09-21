@@ -2,19 +2,19 @@
   {
     "name": "home",
     "url": "/de/",
-    "date": "2026-09-20T15:01:58.539Z",
+    "date": "2026-09-20T09:47:33.407Z",
     "lighthouseVersion": "13.4.1",
-    "performance": 0.96,
+    "performance": 0.97,
     "accessibility": 1,
     "bestPractices": 1,
     "seo": 0.63,
-    "lcp": 2476.9709999999995,
+    "lcp": 2430.636,
     "cls": 0,
     "tbt": 0,
     "environment": {
       "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Mobile Safari/537.36",
       "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
-      "benchmarkIndex": 3078.5,
+      "benchmarkIndex": 3096,
       "credits": {
         "axe-core": "4.13.0"
       }
@@ -23,19 +23,19 @@
   {
     "name": "product",
     "url": "/en/product/concrete-hoodie/",
-    "date": "2026-09-20T15:02:06.136Z",
+    "date": "2026-09-20T09:47:41.039Z",
     "lighthouseVersion": "13.4.1",
-    "performance": 0.94,
+    "performance": 0.95,
     "accessibility": 1,
     "bestPractices": 1,
     "seo": 0.63,
-    "lcp": 2782.3434000000007,
+    "lcp": 2788.79745,
     "cls": 0.0005466673729436415,
-    "tbt": 0,
+    "tbt": 13,
     "environment": {
       "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Mobile Safari/537.36",
       "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
-      "benchmarkIndex": 3040.5,
+      "benchmarkIndex": 3082.5,
       "credits": {
         "axe-core": "4.13.0"
       }

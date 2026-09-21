@@ -1,43 +1,21 @@
-/* Whole panels enter from outside the viewport. Cart exit is coordinated with native close. */
-@media (prefers-reduced-motion: no-preference) {
-  .commerce-cart-drawer[open],
-  .menu-dialog[open] {
-    animation: block-slide-from-right 380ms cubic-bezier(0.22, 0.7, 0.25, 1);
-  }
-
-  .filter-dialog[open] {
-    animation: block-slide-from-bottom 380ms cubic-bezier(0.22, 0.7, 0.25, 1);
-  }
-
-  .product-zoom-dialog[open],
-  .product-guide-dialog[open] {
-    animation: block-slide-to-center 420ms cubic-bezier(0.22, 0.7, 0.25, 1);
-  }
+/* Motion owns transforms; native snapshots never cross-fade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+  mix-blend-mode: normal;
 }
-
-@keyframes block-slide-from-right {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: none;
-  }
+::view-transition-group(root) {
+  animation: none !important;
 }
-
-@keyframes block-slide-from-bottom {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: none;
-  }
+html {
+  overflow-x: clip;
 }
-
-@keyframes block-slide-to-center {
-  from {
-    transform: translateY(calc(50dvh + 50%));
-  }
-  to {
-    transform: none;
-  }
+.page-shell {
+  min-width: 0;
+}
+.catalog-empty {
+  grid-column: 1/-1;
+}
+.product-grid {
+  position: relative;
 }

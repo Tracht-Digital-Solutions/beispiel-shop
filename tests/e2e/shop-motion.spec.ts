@@ -200,6 +200,7 @@ test('fast image changes settle on the selected image and magnification supports
   await detail.focus();
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('ArrowDown');
+  await expect(dialog.locator('img')).toHaveCount(1);
   await expect(dialog.locator('img')).toHaveAttribute('src', '/images/look-1.webp');
   await reset.click();
   await expect(dialog.getByRole('button', { name: 'Zoom in', exact: true })).toHaveAttribute(
@@ -208,6 +209,7 @@ test('fast image changes settle on the selected image and magnification supports
   );
   await dialog.getByRole('button', { name: 'Next image', exact: true }).click();
   await finishMotion(dialog);
+  await expect(dialog.locator('img')).toHaveCount(1);
   await expect(dialog.locator('img')).toHaveAttribute('src', '/images/heavy-tee.webp');
   await expect(first).toHaveAttribute('aria-pressed', 'true');
   await page.keyboard.press('Escape');
@@ -225,6 +227,7 @@ test('touch swipes change images without opening or toggling zoom, and a zoomed 
   const gallery = page.locator('.product-gallery-main');
   const dialog = page.locator('.product-zoom-dialog');
   await swipe(page, gallery, 'left');
+  await expect(gallery.locator('img')).toHaveCount(1);
   await expect(gallery.locator('img')).toHaveAttribute('src', '/images/look-1.webp');
   await expect(gallery).toHaveAttribute('data-sliding', 'false');
   await expect(dialog).not.toBeVisible();
@@ -237,6 +240,7 @@ test('touch swipes change images without opening or toggling zoom, and a zoomed 
   await finishMotion(dialog);
   const detail = dialog.getByRole('button', { name: 'Image detail', exact: true });
   await swipe(page, detail, 'left');
+  await expect(detail.locator('img')).toHaveCount(1);
   await expect(detail.locator('img')).toHaveAttribute('src', '/images/look-1.webp');
   await expect(detail).toHaveAttribute('data-sliding', 'false');
   await expect(detail).toHaveAttribute('aria-pressed', 'false');
@@ -248,6 +252,7 @@ test('touch swipes change images without opening or toggling zoom, and a zoomed 
     .evaluate((node) => getComputedStyle(node).transformOrigin);
   await swipe(page, detail, 'right');
   await expect(detail).toHaveAttribute('aria-pressed', 'true');
+  await expect(detail.locator('img')).toHaveCount(1);
   await expect(detail.locator('img')).toHaveAttribute('src', '/images/look-1.webp');
   await expect
     .poll(() => detail.locator('img').evaluate((node) => getComputedStyle(node).transformOrigin))

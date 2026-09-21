@@ -1,3 +1,4 @@
+import { useSlideDialog } from './useSlideDialog';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { Locale, Product } from '../lib/types';
 import { useStore } from '@nanostores/react';
@@ -14,9 +15,10 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
   const [size, setSize] = useState('');
   const [feedback, setFeedback] = useState('');
   const [ready, setReady] = useState(false);
-  const [activeDialog, setActiveDialog] = useState<'guide' | null>(null);
+  const [, setActiveDialog] = useState<'guide' | null>(null);
   const cart = useStore($cart, { ssr: 'initial' });
   const guideRef = useRef<HTMLDialogElement>(null);
+  useSlideDialog(guideRef, 'center');
   const uid = useId();
   const variants = product.variants.filter((variant) => variant.color === color);
   const selectedVariant = variants.find((variant) => variant.size === size);
@@ -28,14 +30,6 @@ export function ProductDetail({ locale, product }: { locale: Locale; product: Pr
     hydrateCart();
     setReady(true);
   }, []);
-  useEffect(() => {
-    if (!activeDialog) return;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = overflow;
-    };
-  }, [activeDialog]);
 
   function addToCart(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -109,6 +109,7 @@ test('product and lifestyle zoom stay centered, fit the viewport and return focu
         await page.getByRole('button', { name: `Show image ${index + 1}`, exact: true }).click();
         await trigger.click();
         await expect(dialog).toBeVisible();
+        await expect(dialog.locator('img')).toHaveCount(1);
         await expect(dialog.locator('img')).toHaveAttribute('src', source);
         await expectImageContained(dialog, page);
         await expect(

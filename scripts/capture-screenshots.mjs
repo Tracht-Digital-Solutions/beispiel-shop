@@ -21,10 +21,25 @@ for (const [name, options] of [
     window.scrollTo({ top: 0, behavior: 'instant' });
     await Promise.all([...document.images].map((image) => image.decode().catch(() => {})));
   });
+  await page.evaluate(async () => {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await Promise.allSettled(document.getAnimations().map((animation) => animation.finished));
+  });
   await page.screenshot({ path: `docs/screenshots/${name}.png`, fullPage: false });
   await page.screenshot({ path: `docs/screenshots/${name}-full.png`, fullPage: true });
   if (name === 'desktop') {
     await page.goto(base + '/en/product/concrete-hoodie/');
+    await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      for (let y = 0; y < document.body.scrollHeight; y += 600) {
+        window.scrollTo({ top: y, behavior: 'instant' });
+        await new Promise((resolve) => setTimeout(resolve, 80));
+      }
+      await Promise.allSettled(document.getAnimations().map((animation) => animation.finished));
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      await Promise.all([...document.images].map((image) => image.decode().catch(() => {})));
+    });
     await page.screenshot({ path: 'docs/screenshots/product.png', fullPage: true });
   }
   await context.close();

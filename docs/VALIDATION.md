@@ -1,92 +1,67 @@
 # Prüfung und Abnahme
 
-Stand der Funktions- und Browserprüfungen: 19. September 2026. Geprüft wurde der statische Produktionsbuild, lokal unter Windows mit Node.js 24.16.0 und Chromium 153. Screenshots und Performance-Messungen stammen vom 8. September 2026. Die GitHub-Prüfstrecke verwendet zusätzlich Ubuntu und Node.js 24; ihr aktueller Status ist unter [GitHub Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) einsehbar.
+Stand: 20. September 2026. Produktionsbuild unter Windows mit Node.js 24, Chromium 153, Firefox 155 und WebKit 26.6. GitHub Actions prüft zusätzlich unter Ubuntu; aktuelle Ergebnisse stehen unter [Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions).
 
 ## Ergebnis
 
-| Prüfung                                   | Ergebnis                                                       |
-| ----------------------------------------- | -------------------------------------------------------------- |
-| Astro / TypeScript                        | 0 Fehler, 0 Warnungen                                          |
-| Vitest                                    | 34 Tests bestanden                                             |
-| Playwright Desktop + Mobil                | 84 Tests bestanden, 2 bewusst übersprungene Prüfungen          |
-| Statischer Build                          | 46 Seiten erfolgreich erzeugt                                  |
-| Formatprüfung                             | Bestanden                                                      |
-| axe auf den geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
+| Prüfung | Ergebnis |
+| --- | --- |
+| Astro / TypeScript | 56 Dateien, 0 Fehler, 0 Warnungen |
+| Vitest | 34 Tests bestanden |
+| Playwright | 172 bestanden, 4 bewusst übersprungen |
+| Statischer Build | 46 Seiten |
+| Formatprüfung | Bestanden |
+| axe auf geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
 
-Die 320- und 834-Pixel-Prüfung wird einmal im Desktop-Testprojekt ausgeführt; derselbe Fall ist im mobilen Projekt zur Vermeidung einer doppelten Ausführung übersprungen. Der Touchgesten-Test läuft ausschließlich im mobilen Projekt. Die Gesten werden in Chromium mit Touch-Eingaben nachgestellt; dies ersetzt keinen Test auf einem physischen Smartphone. Die Browserprüfungen schließen verzögert geladene interaktive Bereiche mit vorhandenem Warenkorb ein und prüfen dabei auf JavaScript- und Hydrationfehler.
+Vier Browserprojekte prüfen Desktop-Chromium, Pixel-7-Emulation, Firefox und WebKit. Der Touch-Test läuft nur im mobilen Projekt (drei übersprungene Desktop-Fälle); die zusätzliche 320-/834-Pixel-Prüfung wird im mobilen Projekt nicht doppelt ausgeführt. Emulation ersetzt keine Prüfung auf physischen Geräten.
 
-Ein zusätzlicher Test hält das Laden der Produktbedienung gezielt an: Bildzoom, Bildwechsel, Farbe, Größe und Größenhilfe bleiben währenddessen deaktiviert. Nach dem Laden funktionieren Bildzoom und Größenauswahl unmittelbar; ein früher Klick kann nicht mehr vor dem Aktivieren der Bedienung verloren gehen.
+## Funktionen und Bewegung
 
-Der lokale Abschlusslauf am 19. September verwendete die reguläre Playwright-Konfiguration mit Port 4321 und vier parallelen Prozessen.
+- Deutscher und englischer Kaufablauf, Größenwahl, Mengen, Neuladen, Versandgrenzen, Formularvalidierung, Beispieldaten und simulierte Bestätigung. Keine Bestell-POSTs oder dauerhaft gespeicherten Adressen.
+- Kombinierte Suche und Filter, URL-Wiederherstellung, Sortierung mit erhaltenen Produktknoten, leere Treffer, nicht verfügbare Varianten und Lagergrenzen.
+- Beschädigter oder blockierter Browserspeicher: Sitzungsspeicher als Ersatz; bei vollständig gesperrtem Speicher bleibt der Warenkorb bei interner Navigation im Arbeitsspeicher, geht beim vollständigen Neuladen verloren. Der Hinweis erklärt dies.
+- Volle Slides für Seiten- und Sprachwechsel, Kategorie, Suchergebnisse, Tags, Dropdowns, Warenkorb und Artikel, Galerie, Akkordeons und Checkout. Deckkraft bleibt konstant. Schnelle Richtungswechsel und erneutes Hinzufügen während eines Ausgangs sind geprüft.
+- Dialoge behalten Fokusbegrenzung und Hintergrundsperre bis zum Ende des Ausgangs. Escape, Außenklick, Fokusrückgabe und Tastaturbedienung werden geprüft. Dropdowns im Filterdialog bleiben innerhalb der modalen Oberfläche.
+- Bildzoom und Mauslupe, Pfeiltasten und Touchgesten; Bilddialog und Größentabelle passen auch bei 320 × 568 und 667 × 375 Pixeln in den sichtbaren Bereich.
+- Wiederholte Navigation, Verlauf und Sprachwechsel erhalten den Warenkorb und erzeugen keine doppelten Inseln oder JavaScript-Fehler. Noch nicht aktivierte Bedienung bleibt deaktiviert.
+- Scroll-Einstiege laufen einmal. Tastaturfokus legt Inhalte sofort frei. Bewegungsreduktion wirkt auch während laufender Übergänge; ohne JavaScript bleiben statische Inhalte sichtbar.
 
-## Funktionsumfang der Prüfung
+Details, Zeitwerte und Primärquellen: [MOTION.md](MOTION.md). Automatisierte Prüfungen sind keine vollständige WCAG-Konformitätszertifizierung.
 
-- Vollständiger Kaufablauf auf Deutsch und Englisch: verfügbare Größe wählen, Warenkorb öffnen, Mengen ändern, Seite neu laden, Adresse validieren, Beispieldaten einsetzen, Versand prüfen und Demo-Bestätigung anzeigen.
-- Sprachwechsel auf derselben Produktseite mit erhaltenem Warenkorb; Entfernen des letzten Artikels und leerer Checkout nach Abschluss.
-- Kombinierte Filter, Sortierung, URL-Wiederherstellung und leere Suchergebnisse. Produkt- und Variantenkennungen, lokalisierte Produktdaten und alle ausgelieferten Bildpfade werden geprüft.
-- Nicht verfügbare Größen, maximale Bestände, fehlerhafte gespeicherte Werte, doppelte Varianten, Versand unter und genau ab 100 Euro.
-- Blockierter dauerhafter Speicher und erschöpftes Speicherkontingent: Der Sitzungsspeicher hält die Auswahl bis zum Schließen des Tabs. Auch die Rückkehr zu funktionierendem dauerhaftem Speicher wird geprüft.
-- Sind beide Speicher blockiert, bleiben Warenkorb und Mengenänderungen auf der aktuellen Seite nutzbar. Ein sichtbarer Hinweis erklärt, dass die Auswahl bei Navigation oder Neuladen verloren geht. Dieser Sonderfall wurde zusätzlich im Browser nachgestellt.
-- Es entstehen im getesteten Kaufablauf keine POST-Anfragen. Adressen werden nicht im Browserspeicher abgelegt und bei Abschluss verworfen.
+Aktuelle Aufnahmen: [Desktop](screenshots/desktop.png), [Mobil](screenshots/mobile.png), [Tablet](screenshots/tablet.png), [Produkt](screenshots/product.png). Vollständige Seitenaufnahmen liegen im selben Verzeichnis.
 
-## Darstellung und Bedienung
+## Reproduzierbare Labormessungen
 
-Desktop mit 1440 Pixeln Breite, Pixel-7-Emulation, Tablet mit 834 Pixeln und kleines Smartphone mit 320 Pixeln wurden geprüft. Repräsentative Seiten zeigen keinen horizontalen Überlauf. Die [Desktopansicht](screenshots/desktop.png), [Mobilansicht](screenshots/mobile.png), [Tabletansicht](screenshots/tablet.png) und [Produktseite](screenshots/product.png) wurden visuell kontrolliert. Vollständige Seitenaufnahmen liegen im selben Verzeichnis.
+Lighthouse 13.4.1, mobiles Standardprofil, 412 × 823 Pixel, simuliertes Netz (150 ms RTT, 1.638,4 kbit/s) und vierfach verlangsamte CPU. Vorher und nachher am 20. September 2026 auf demselben Rechner; einzelne Messungen unterliegen Schwankungen.
 
-Die automatisierten axe-Prüfungen decken Startseite, Katalog, Produktseite, Lookbook, Warenkorb-Dialog, Adresse, Bestellprüfung sowie mobile Navigation und Filter ab. Tastaturprüfungen umfassen Escape, Fokusrückgabe und den Warenkorb am maximalen Bestand. Tab und Umschalt+Tab erreichen bei geöffnetem Warenkorb keine Hintergrund-Bedienelemente. Sichtbare Fokusrahmen bleiben erhalten.
+| Seite | Performance vorher → nachher | LCP vorher → nachher | CLS nachher | TBT nachher |
+| --- | --- | --- | --- | --- |
+| Startseite | 97 → 96 | 2,43 → 2,48 s | 0 | 0 ms |
+| Produktseite | 95 → 94 | 2,79 → 2,78 s | 0,00055 | 0 ms |
 
-Die vergrößerten Produkt- und Lookbookbilder sowie die Größentabelle werden zusätzlich bei 1440 × 900, 320 × 568 und 667 × 375 Pixeln geprüft. Nach dem Einschieben stehen die Dialoge zentriert und innerhalb des sichtbaren Bereichs, Bilder behalten ihr Seitenverhältnis. Escape, Schließen-Button und Hintergrundklick schließen mit Fokusrückgabe; Klicks auf freien Innenabstand der Größentabelle lassen sie geöffnet. Die Zentrierung bleibt nach Scrollen erhalten. Die deutsche Bildansicht wurde am 9. September in diesen drei Formaten zusätzlich visuell kontrolliert.
+Accessibility und Best Practices erreichen jeweils 100/100. Der Produkt-LCP bleibt über der Orientierung von 2,5 Sekunden. Die bewusst gesetzte `noindex`-Anweisung begrenzt den SEO-Wert auf 63. Die neue Animationsbibliothek und zugängliche Auswahlmenüs benötigen zusätzliches JavaScript; LazyMotion und Motion Mini begrenzen den Umfang.
 
-Bei aktivierter Einstellung für reduzierte Bewegung werden weiches Scrollen und Bildbewegungen deaktiviert. Diese Einstellung wurde auf Desktop und Mobilgerät nachgestellt. Automatische Prüfungen und diese Bedienkontrollen sind keine vollständige WCAG-Konformitätszertifizierung; eine Prüfung mit realen assistiven Technologien bleibt eine separate Abnahme.
+Rohdaten: [Vorher](performance/before-motion.json), [Nachher](performance/summary.json), [Startseite](performance/home.json), [Produktseite](performance/product.json).
 
-Die Bedienanimationen verwenden ausschließlich Schiebebewegungen ohne Einblenden oder Zähler- und Buttonimpulse. Warenkorb und mobiles Menü fahren vollständig vom rechten Bildschirmrand herein (380 ms). Der Warenkorb schiebt sich beim Schließen wieder hinaus; Inhalt, Scrollsperre und Dialogfokus bleiben bis zum Abschluss erhalten. Artikel fahren hinein (360 ms) und hinaus (280 ms). Entfernen aktualisiert den gespeicherten Warenkorb sofort; nur die sichtbare Zeile bleibt für die Ausgangsbewegung bestehen. Erneutes Hinzufügen kann eine laufende Ausgangsbewegung abbrechen, ohne den neuen Artikel zu verlieren.
-
-Beim Sprachwechsel bewegt sich die gesamte sichtbare Seite einschließlich Kopf- und Fußbereich horizontal um eine volle Bildschirmbreite (460 ms). Deutsch → Englisch läuft nach links, Englisch → Deutsch nach rechts, ohne Überblendung. Route, Suchparameter, Filter, Sprungmarke und gespeicherter Warenkorb bleiben erhalten. Die Umsetzung nutzt [native Übergänge zwischen Dokumenten](https://developer.chrome.com/docs/web-platform/view-transitions/cross-document); die zugehörigen Styles und Ereignisse stehen direkt im Dokumentkopf bereit, damit auch ein früher erster Bildaufbau den Übergang erhält. Normale Seitennavigation, fehlende Browserunterstützung und reduzierte Bewegung wechseln unmittelbar. Desktop und Mobilgerät prüfen beide Richtungen und die unveränderte Deckkraft; zusätzliche parallele mobile Wiederholungen bestanden nach der Korrektur der Ladereihenfolge.
-
-Die Lupe im Kopfbereich führt von einer Produktseite direkt ins fokussierte Katalog-Suchfeld. Im Katalog bleiben vorhandene Filter beim Öffnen der Suche erhalten. Die Lupe am Eingabefeld ist ein 44 × 44 Pixel großer Suchknopf: Klick und Enter führen zur Trefferzahl, eine leere Suche fokussiert das Eingabefeld. Die Live-Suche und die Swipe-Bewegung ihrer Ergebnisse bleiben erhalten. Deutsch und Englisch, leere Trefferlisten, Tastaturfokus und schmale Ansichten sind geprüft; die aktualisierte Suche wurde zusätzlich in der eingebetteten Vorschau visuell kontrolliert.
-
-Produktbilder wechseln mit einem vollständigen horizontalen Swipe (360 ms), über Vorschaubilder, Pfeiltasten und Touchgesten. Eine Mauslupe vergrößert den Bereich unter dem Zeiger um den Faktor 2,5. In der Vollbildansicht lässt sich die Vergrößerung per Button oder Tippen aktivieren und per Ziehen oder Pfeiltasten verschieben. Hover-Pfeile und Mauslupe schieben sich herein (280 ms); die Pfeile bleiben auf Touchgeräten sichtbar. Akkordeons schieben ihren Inhalt beim Öffnen und Schließen vertikal und passen die Höhe an (340 ms). Schnelle Richtungswechsel bleiben bedienbar.
-
-Kategorie-Wechsel schieben die Produktgruppe entsprechend der Registerkarten-Reihenfolge nach links oder rechts. Bei Suche und Filtern verlassen ausgeschlossene Karten ihre Plätze nach links, verbleibende Treffer nach rechts; anschließend fährt die neue Trefferliste von rechts herein. So springt beim Neuordnen keine noch sichtbare Karte auf ihre Startposition. Die Ausgangsbewegung dauert 220 ms, die Eingangsbewegung 340 ms, ohne Änderung der Deckkraft. Während der Ausgangsbewegung sind alte Ergebnisse nicht mehr fokussierbar oder für assistive Technik erreichbar. Suchfeld, Filter, Trefferzahl und URL reagieren unmittelbar; neue Eingaben brechen überholte Bewegungen ab. Die Prüfungen decken Deutsch und Englisch, beide Swipe-Richtungen, leere Trefferlisten, Zurücksetzen mit Fokusrückgabe, Navigation zurück zum Katalog, Neuladen sowie eine während des Wechsels aktivierte Bewegungsreduktion ab.
-
-Neue Filter-Tags fahren von rechts vollständig herein (320 ms); beim Entfernen und Zurücksetzen fahren sie nach links hinaus (260 ms). Es wird keine Deckkraft animiert. URL und Filterwirkung ändern sich sofort; die ausfahrenden Tags sind nicht mehr bedienbar. Erneutes Auswählen während der Bewegung verwirft den alten Ausgang, ohne den neuen Filter zu entfernen. Richtungswechsel übernehmen die aktuell sichtbare Position; Änderungen am Text eines vorhandenen Tags starten keine zusätzliche Eingangsbewegung. Die Tests prüfen auch die volle Eingangsbreite, Entfernen während des Einschiebens und Bewegungsreduktion während einer laufenden Animation. Nach dem Wegklicken erhält das Suchfeld den Fokus. Deutsch, Englisch und eine während der Bewegung aktivierte Bewegungsreduktion sind geprüft.
-
-Der Produktfilter fährt von unten herein und beim Schließen vollständig nach unten hinaus (je 380 ms). Das gilt für Schließen-Button, Ergebnis-Button, Escape und Hintergrundklick; Klicks auf den Innenabstand lassen ihn geöffnet. Dialogfokus und modaler Zustand bleiben bis zum Ende der Ausgangsbewegung erhalten, danach kehrt der Fokus zum Öffner zurück. Bildansicht und Größenhilfe bewegen sich von unterhalb des Bildschirms in ihre zentrierte Position (420 ms). Bei `prefers-reduced-motion: reduce` erfolgen die Zustandswechsel unmittelbar. Automatisierte Prüfungen decken die Bewegungen einschließlich Fokus, letzten Warenkorbartikel, schnelle Bild- und Akkordeonwechsel, Mauslupe, Touchgesten und reduzierte Bewegung ab.
-
-Die Auswahlmenüs für Sortierung, Größe, Farbe, Preis und Lieferland verwenden eine vollständige vertikale Ein- und Ausschubbewegung (320 ms) ohne Änderung der Deckkraft. Die [anpassbaren nativen Select-Menüs](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Customizable_select) behalten die integrierte Auswahl, Tastaturbedienung und Formularwerte. Auswahl und Escape schließen das Menü; innerhalb des mobilen Filters bleibt der umgebende Dialog geöffnet. Reduzierte Bewegung deaktiviert die Übergänge, auch während einer laufenden Bewegung. Browser ohne `appearance: base-select` behalten ihr natives Auswahlmenü ohne Swipe. Die neuen Prüfungen decken Zwischenbilder beim Öffnen und Schließen, konstante Deckkraft, Tastaturauswahl, URL-Aktualisierung und Bewegungsreduktion auf Deutsch und Englisch ab. Die Dropdown-Darstellung wurde zusätzlich in der eingebetteten Vorschau kontrolliert.
-
-## Reproduzierbare Labormessung
-
-Die Rohberichte liegen unter [performance/home.json](performance/home.json), [performance/product.json](performance/product.json) und [performance/summary.json](performance/summary.json). Die Messung verwendet Lighthouse 13.4.1 mit seinem mobilen Standardprofil: 412 × 823 Pixel, simuliertes Netz mit 150 ms RTT und 1.638,4 kbit/s sowie vierfach verlangsamter CPU.
-
-Abschließender Lauf am 8. September 2026 um 11:40 UTC:
-
-| Seite                                  | Performance | Accessibility | Best Practices | LCP    | CLS   | TBT  |
-| -------------------------------------- | ----------- | ------------- | -------------- | ------ | ----- | ---- |
-| Startseite `/de/`                      | 97/100      | 100/100       | 100/100        | 2,26 s | 0,057 | 0 ms |
-| Produkt `/en/product/concrete-hoodie/` | 95/100      | 100/100       | 100/100        | 2,78 s | 0,000 | 0 ms |
-
-Der Produkt-LCP liegt in diesem einzelnen Lauf über der Orientierung von 2,5 Sekunden. Der Bericht nennt unter anderem Bildauslieferung und renderblockierende Ressourcen als weitere Optimierungsmöglichkeiten. Messungen schwanken mit dem Rechnerzustand; diese Werte sind keine garantierten Ladezeiten.
-
-Es handelt sich um einzelne lokale Navigationsmessungen, nicht um echte Besucherdaten oder Messungen des späteren Hosts. TBT ist eine Laborkennzahl; sie ersetzt keinen INP-Wert aus echten Interaktionen. Server-, CDN- und Netzeigenschaften des späteren Deployments müssen dort erneut geprüft werden.
-
-Die Demo ist bewusst mit `noindex,follow` versehen. Der dadurch reduzierte SEO-Wert ist im vollständigen Bericht sichtbar. Sprachabhängige Titel, Beschreibungen und Vorschaubilder sind vorhanden; Canonical- und Sprachalternativen erhalten mit `PUBLIC_SITE_URL` die endgültige Domain.
+Ein separater, ungedrosselter Chromium-Lauf bei 1440 × 960 Pixeln erfasst jeweils eine Sekunde für Suche, Zurücksetzen, Kategorie- und Sprachwechsel: Median 16,7 ms, p95 höchstens 16,8 ms, kein Intervall über 50 ms. [Messdaten](performance/motion-frames.json). Das Skript erzeugt außerdem lokal einen Playwright-Trace unter `.cache/motion-performance-trace.zip`. Die rAF-Abstände sind eine begrenzte Laborstichprobe und kein Beleg für garantierte Bildraten auf anderen Geräten. Es liegen keine echten Nutzungsdaten oder INP-Messungen vor.
 
 ```sh
 npm ci
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm run type-check
 npm run test:run
 npm run build
 npm run test:e2e
+npm run format:check
 npm run preview
 # In einem zweiten Terminal:
-npm run screenshots
 npm run audit:performance
+node scripts/audit-motion.mjs
+npm run screenshots
 ```
 
-Auf Linux kann die Browserinstallation mit `npx playwright install --with-deps chromium` ergänzt werden. Die Skripte verwenden standardmäßig `http://127.0.0.1:4321`; `PREVIEW_URL` erlaubt eine andere Produktionsvorschau. Die vollständigen Einstellungen und verwendeten Browser-Versionen stehen auch in den Rohberichten.
+Unter Linux Browser mit `--with-deps` installieren. Die Messskripte verwenden Port 4321; `PREVIEW_URL` erlaubt eine andere Produktionsvorschau. Während Browserprüfungen oder Messungen nicht erneut bauen.
 
 ## Veröffentlichung
 
-Der Push nach `main` startet den geprüften Build für den Artefaktbranch `dev`. Dort ordnet `build-info.json` die statischen Dateien dem Quellcommit und dem Workflow-Lauf zu. Der manuelle Release-Workflow wird bei dieser Übergabe nicht ausgelöst. Domain, Hosting und eventuelle Webhook-Konfiguration sind in [INSTALL.md](../INSTALL.md) beschrieben.
+Push nach `main` startet die vollständige Prüfung und veröffentlicht anschließend statische Dateien nach `dev`. Der ausdrücklich beauftragte manuelle Release baut und prüft denselben Quellstand erneut, veröffentlicht nach `release` und benachrichtigt den konfigurierten Deployment-Webhook. `build-info.json` ordnet die Dateien dem Quellcommit und Workflow zu. Der Shop bleibt eine Kaufdemo. Workflow-Ergebnisse und die separat zu prüfende Webhook-Antwort dokumentieren den Veröffentlichungserfolg; eine erfolgreiche Benachrichtigung allein bestätigt noch nicht den Zustand des externen Hosts.

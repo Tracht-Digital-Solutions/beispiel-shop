@@ -17,6 +17,14 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 960 } },
     },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'], viewport: { width: 1440, height: 960 } },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'], viewport: { width: 1440, height: 960 } },
+    },
   ],
   webServer: {
     command: 'npm run preview -- --port 4321 --ignore-lock',

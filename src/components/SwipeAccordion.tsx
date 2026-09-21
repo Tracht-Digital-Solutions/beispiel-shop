@@ -1,3 +1,6 @@
+import { animate } from 'motion/mini';
+import type { AnimationPlaybackControls } from 'motion';
+import { ease, timing } from '../lib/motion';
 import { useEffect, useRef, type MouseEvent, type ReactNode } from 'react';
 import './swipe-accordion.css';
 
@@ -17,7 +20,7 @@ export default function SwipeAccordion({
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const expandedRef = useRef(defaultOpen);
-  const animationsRef = useRef<Animation[]>([]);
+  const animationsRef = useRef<AnimationPlaybackControls[]>([]);
 
   function cancelAnimations() {
     for (const animation of animationsRef.current) animation.cancel();
@@ -27,7 +30,11 @@ export default function SwipeAccordion({
   function finish() {
     cancelAnimations();
     if (detailsRef.current) detailsRef.current.open = expandedRef.current;
-    if (viewportRef.current) viewportRef.current.inert = false;
+    if (viewportRef.current) {
+      viewportRef.current.inert = false;
+      viewportRef.current.style.height = '';
+    }
+    if (contentRef.current) contentRef.current.style.transform = '';
   }
 
   useEffect(() => {
@@ -77,23 +84,21 @@ export default function SwipeAccordion({
     cancelAnimations();
     details.open = true;
     const toHeight = expanded ? content.getBoundingClientRect().height : 0;
-    const options: KeyframeAnimationOptions = {
-      duration: 340,
-      easing: 'cubic-bezier(0.22, 0.7, 0.25, 1)',
-      fill: 'both',
-    };
-    const height = viewport.animate(
-      [{ height: `${fromHeight}px` }, { height: `${toHeight}px` }],
-      options,
-    );
-    const slide = content.animate(
-      [{ transform: fromTransform }, { transform: expanded ? 'none' : 'translateY(-100%)' }],
+    const options = { duration: timing.content, ease };
+    const height = animate(viewport, { height: [fromHeight, toHeight] }, options);
+    const slide = animate(
+      content,
+      { transform: [fromTransform, expanded ? 'none' : 'translateY(-100%)'] },
       options,
     );
     animationsRef.current = [height, slide];
-    height.onfinish = () => {
-      if (animationsRef.current[0] === height) finish();
-    };
+    height.then(() => {
+      if (animationsRef.current[0] === height) {
+        finish();
+        viewport.style.height = '';
+        content.style.transform = '';
+      }
+    });
   }
 
   return (

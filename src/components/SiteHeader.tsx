@@ -1,3 +1,4 @@
+import { useSlideDialog } from './useSlideDialog';
 import { useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { $cart, $cartOpen, hydrateCart, cartTotals } from '../lib/cart';
@@ -7,6 +8,7 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
   const items = useStore($cart, { ssr: 'initial' });
   const count = cartTotals(items).count;
   const mobile = useRef<HTMLDialogElement>(null);
+  useSlideDialog(mobile, 'right');
   useEffect(hydrateCart, []);
   const other = locale === 'de' ? 'en' : 'de';
   const changeLanguage = (event: React.SyntheticEvent<HTMLAnchorElement>) => {
@@ -14,7 +16,7 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
     event.currentTarget.href = path(other, route) + location.search + location.hash;
   };
   const openSearch = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (route !== 'shop') return;
+    if (!/^\/(de|en)\/shop\/?$/.test(location.pathname)) return;
     event.currentTarget.href = path(locale, 'shop') + location.search + '#catalog-search';
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
       return;
@@ -67,6 +69,11 @@ export default function SiteHeader({ locale, route = '' }: { locale: Locale; rou
           <a
             className="search-link icon-button"
             href={path(locale, 'shop') + '#catalog-search'}
+            onPointerDown={(event) => {
+              if (/^\/(de|en)\/shop\/?$/.test(location.pathname))
+                event.currentTarget.href =
+                  path(locale, 'shop') + location.search + '#catalog-search';
+            }}
             onClick={openSearch}
             aria-label={t(locale, 'Suchen', 'Search')}
           >

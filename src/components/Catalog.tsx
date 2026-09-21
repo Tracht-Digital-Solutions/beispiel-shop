@@ -1,3 +1,4 @@
+import SlideSelect from './SlideSelect';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { products } from '../lib/catalog';
 import { categoryNames, t, money } from '../lib/i18n';
@@ -23,9 +24,10 @@ export default function Catalog({ locale }: { locale: Locale }) {
         search.current?.scrollIntoView({ block: 'center', behavior: 'instant' });
       }
     };
-    focusSearch();
+    const focusFrame = requestAnimationFrame(focusSearch);
     window.addEventListener('hashchange', focusSearch);
     return () => {
+      cancelAnimationFrame(focusFrame);
       window.removeEventListener('popstate', pop);
       window.removeEventListener('hashchange', focusSearch);
     };
@@ -38,14 +40,14 @@ export default function Catalog({ locale }: { locale: Locale }) {
       if (v && v !== defaultFilters[k as keyof Filters]) params.set(k, v);
     });
     history.replaceState(
-      null,
+      history.state,
       '',
       `${location.pathname}${params.size ? '?' + params : ''}${location.hash}`,
     );
   }
   function reset() {
     setFilters(defaultFilters);
-    history.replaceState(null, '', location.pathname + location.hash);
+    history.replaceState(history.state, '', location.pathname + location.hash);
   }
   function submitSearch(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,7 +63,8 @@ export default function Catalog({ locale }: { locale: Locale }) {
     <>
       <label htmlFor={`${prefix}-size`}>
         {t(locale, 'Größe', 'Size')}
-        <select
+        <SlideSelect
+          disabled={!ready}
           id={`${prefix}-size`}
           value={filters.size}
           onChange={(e) => update('size', e.target.value)}
@@ -70,11 +73,12 @@ export default function Catalog({ locale }: { locale: Locale }) {
           {['XS', 'S', 'M', 'L', 'XL', 'One size', '36–40', '41–46'].map((s) => (
             <option key={s}>{s}</option>
           ))}
-        </select>
+        </SlideSelect>
       </label>
       <label htmlFor={`${prefix}-color`}>
         {t(locale, 'Farbe', 'Colour')}
-        <select
+        <SlideSelect
+          disabled={!ready}
           id={`${prefix}-color`}
           value={filters.color}
           onChange={(e) => update('color', e.target.value)}
@@ -85,11 +89,12 @@ export default function Catalog({ locale }: { locale: Locale }) {
               {c.colorName[locale]}
             </option>
           ))}
-        </select>
+        </SlideSelect>
       </label>
       <label htmlFor={`${prefix}-price`}>
         {t(locale, 'Preis', 'Price')}
-        <select
+        <SlideSelect
+          disabled={!ready}
           id={`${prefix}-price`}
           value={filters.price}
           onChange={(e) => update('price', e.target.value)}
@@ -100,7 +105,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
               {t(locale, 'Bis', 'Up to')} {money(p, locale)}
             </option>
           ))}
-        </select>
+        </SlideSelect>
       </label>
     </>
   );
@@ -112,6 +117,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
     >
       <div className="category-tabs">
         <button
+          disabled={!ready}
           className={!filters.category ? 'active' : ''}
           aria-pressed={!filters.category}
           onClick={() => update('category', '')}
@@ -121,6 +127,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
         {Object.entries(categoryNames).map(([key, name]) => (
           <button
             key={key}
+            disabled={!ready}
             className={filters.category === key ? 'active' : ''}
             aria-pressed={filters.category === key}
             onClick={() => update('category', key)}
@@ -153,6 +160,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
             </svg>
           </button>
           <input
+            disabled={!ready}
             id="catalog-search"
             name="q"
             enterKeyHint="search"
@@ -165,6 +173,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
         </form>
         <div className="desktop-filters">{filterFields('desktop')}</div>
         <button
+          disabled={!ready}
           className="mobile-filter-button btn-outline"
           onClick={() => dialog.current?.showModal()}
         >
@@ -172,7 +181,8 @@ export default function Catalog({ locale }: { locale: Locale }) {
         </button>
         <label className="sort-field">
           <span className="sr-only">{t(locale, 'Sortierung', 'Sort by')}</span>
-          <select
+          <SlideSelect
+            disabled={!ready}
             aria-label={t(locale, 'Sortierung', 'Sort by')}
             value={filters.sort}
             onChange={(e) => update('sort', e.target.value)}
@@ -186,7 +196,7 @@ export default function Catalog({ locale }: { locale: Locale }) {
               {t(locale, 'Preis absteigend', 'Price: high to low')}
             </option>
             <option value="name">Name A–Z</option>
-          </select>
+          </SlideSelect>
         </label>
       </div>
       <div className="catalog-status">

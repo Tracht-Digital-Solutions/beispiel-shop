@@ -1,3 +1,4 @@
+import { slideElement } from '../lib/motion';
 import { useCallback, useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { $cart, cartEntries } from '../lib/cart';
@@ -18,7 +19,7 @@ export function useCartRows() {
     const entries = cartEntries(items);
     const next: CartRow[] = entries.map((entry) => {
       const previous = rows.find((row) => row.variant.id === entry.variant.id);
-      const entering = !previous || previous.phase === 'exit' || entry.quantity > previous.quantity;
+      const entering = !previous || previous.phase === 'exit';
       return {
         ...entry,
         phase: entering ? 'enter' : previous.phase,
@@ -54,31 +55,5 @@ export function slide(
   duration: number,
   complete: () => void,
 ) {
-  const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (preference.matches || !element.animate) {
-    complete();
-    return;
-  }
-  const animation = element.animate([{ transform: from }, { transform: to }], {
-    duration,
-    easing: 'cubic-bezier(0.22, 0.7, 0.25, 1)',
-    fill: 'forwards',
-  });
-  let cancelled = false;
-  const reduce = () => {
-    if (preference.matches) animation.finish();
-  };
-  preference.addEventListener('change', reduce);
-  animation.finished
-    .then(() => {
-      if (!cancelled) complete();
-    })
-    .catch(() => {
-      /* A new state can reverse an unfinished movement. */
-    });
-  return () => {
-    cancelled = true;
-    preference.removeEventListener('change', reduce);
-    animation.cancel();
-  };
+  return slideElement(element, from, to, duration / 1000, complete);
 }

@@ -5,9 +5,7 @@ import '@fontsource/barlow-condensed/700.css';
 import '../styles/global.css';
 import '../styles/motion.css';
 import '../styles/dropdown-swipe.css';
-// The incoming document must opt in before its first pagereveal, even on a cold load.
-import languageSwipe from '../styles/language-swipe.css?raw';
-import languageNavigation from '../lib/language-navigation.js?raw';
+import { ClientRouter } from 'astro:transitions';
 import SiteHeader from '../components/SiteHeader';
 import TdsBrandBar from '../components/TdsBrandBar.astro';
 import { CartDrawer } from '../components/Cart';
@@ -73,46 +71,49 @@ const canonical = Astro.site ? new URL(path(locale, route), Astro.site).href : u
     /><meta
       property="og:image"
       content={Astro.site ? new URL(image, Astro.site).href : image}
-    /><meta name="twitter:card" content="summary_large_image" /><style
-      is:inline
-      set:html={languageSwipe}
-    ></style><script is:inline set:html={languageNavigation} /><slot name="head" /></head
+    /><meta name="twitter:card" content="summary_large_image" /><ClientRouter
+      fallback="swap"
+    /><script>
+      import '../lib/page-motion';
+    </script><slot name="head" /></head
   ><body
-    ><a class="skip-link" href="#main">{t(locale, 'Zum Inhalt', 'Skip to content')}</a><SiteHeader
-      locale={locale}
-      route={route}
-      client:load
-    /><main id="main"><slot /></main><footer class="site-footer">
-      <div class="footer-top">
-        <div>
-          <a class="footer-wordmark" href={path(locale)}>BLOCK/01</a><p>
-            {t(locale, 'Für deinen eigenen Rhythmus.', 'Made for your own rhythm.')}<br
-            />Independent spirit. Everyday uniform.
-          </p>
-        </div><div class="footer-links">
+    ><div class="page-shell">
+      <a class="skip-link" href="#main">{t(locale, 'Zum Inhalt', 'Skip to content')}</a><SiteHeader
+        locale={locale}
+        route={route}
+        client:load
+      /><main id="main"><slot /></main><footer class="site-footer">
+        <div class="footer-top">
           <div>
-            <span class="eyebrow">EXPLORE</span><a href={path(locale, 'shop')}
-              >{t(locale, 'Alle Produkte', 'All products')}</a
-            ><a href={path(locale, 'lookbook')}>Lookbook</a><a href={path(locale, 'about')}
-              >{t(locale, 'Die Marke', 'Our story')}</a
-            >
-          </div><div>
-            <span class="eyebrow">INFORMATION</span><a href={path(locale, 'about') + '#shipping'}
-              >{t(locale, 'Versand & Rückgabe', 'Shipping & returns')}</a
-            ><a href={path(locale, 'about') + '#demo'}
-              >{t(locale, 'Über diese Demo', 'About this demo')}</a
-            ><a href="https://tracht-digital.de/" target="_blank" rel="noreferrer"
-              >Tracht Digital Solutions ↗</a
-            >
+            <a class="footer-wordmark" href={path(locale)}>BLOCK/01</a><p>
+              {t(locale, 'Für deinen eigenen Rhythmus.', 'Made for your own rhythm.')}<br
+              />Independent spirit. Everyday uniform.
+            </p>
+          </div><div class="footer-links">
+            <div>
+              <span class="eyebrow">EXPLORE</span><a href={path(locale, 'shop')}
+                >{t(locale, 'Alle Produkte', 'All products')}</a
+              ><a href={path(locale, 'lookbook')}>Lookbook</a><a href={path(locale, 'about')}
+                >{t(locale, 'Die Marke', 'Our story')}</a
+              >
+            </div><div>
+              <span class="eyebrow">INFORMATION</span><a href={path(locale, 'about') + '#shipping'}
+                >{t(locale, 'Versand & Rückgabe', 'Shipping & returns')}</a
+              ><a href={path(locale, 'about') + '#demo'}
+                >{t(locale, 'Über diese Demo', 'About this demo')}</a
+              ><a href="https://tracht-digital.de/" target="_blank" rel="noreferrer"
+                >Tracht Digital Solutions ↗</a
+              >
+            </div>
           </div>
+        </div><div class="footer-bottom">
+          <span
+            >© {new Date().getFullYear()} BLOCK/01 — {
+              t(locale, 'Fiktive Demo-Marke', 'Fictional demo brand')
+            }</span
+          ><span>{t(locale, 'Keine echten Bestellungen.', 'No real orders.')}</span>
         </div>
-      </div><div class="footer-bottom">
-        <span
-          >© {new Date().getFullYear()} BLOCK/01 — {
-            t(locale, 'Fiktive Demo-Marke', 'Fictional demo brand')
-          }</span
-        ><span>{t(locale, 'Keine echten Bestellungen.', 'No real orders.')}</span>
-      </div>
-    </footer><TdsBrandBar locale={locale} /><CartDrawer locale={locale} client:load /></body
+      </footer><TdsBrandBar locale={locale} /><CartDrawer locale={locale} client:load />
+    </div></body
   >
 </html>

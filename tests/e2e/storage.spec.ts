@@ -60,17 +60,14 @@ test('fully blocked storage stays usable and navigates without hydration errors'
     }
   });
   await addTee(page);
-  await expect(page.locator('.commerce-notice')).toContainText(
-    'lost when you reload or change pages',
-  );
+  await expect(page.locator('.commerce-notice')).toContainText('until you reload');
   await page.getByRole('button', { name: 'Increase quantity of Heavyweight Tee' }).click();
   await expect(page.locator('.commerce-quantity input')).toHaveValue('2');
   await page.getByRole('link', { name: 'View bag', exact: true }).click();
   await expect(page.locator('astro-island[ssr]')).toHaveCount(0);
-  await expect(page.locator('.commerce-cart-item')).toHaveCount(0);
-  await expect(page.locator('.commerce-notice')).toContainText(
-    'lost when you reload or change pages',
-  );
+  await expect(page.locator('.commerce-cart-item')).toHaveCount(1);
+  await expect(page.locator('.commerce-quantity input')).toHaveValue('2');
+  await expect(page.locator('.commerce-notice')).toContainText('until you reload');
   await page.goto('/en/checkout/');
   await expect(page.locator('astro-island[ssr]')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Your fit is missing.' })).toBeVisible();

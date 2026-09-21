@@ -1,4 +1,5 @@
-import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
+import { type ReactNode, type RefObject } from 'react';
+import { useSlideDialog } from './useSlideDialog';
 import { t } from '../lib/i18n';
 import type { Locale } from '../lib/types';
 
@@ -17,53 +18,8 @@ export default function FilterDialog({
   onReset,
   children,
 }: FilterDialogProps) {
-  const pendingClose = useRef<{ animation: Animation; cancel: () => void } | null>(null);
-
-  useEffect(() => () => pendingClose.current?.cancel(), []);
-
-  function close() {
-    const dialog = dialogRef.current;
-    if (!dialog?.open || pendingClose.current) return;
-
-    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (preference.matches || typeof dialog.animate !== 'function') {
-      dialog.close();
-      return;
-    }
-
-    // Start from the displayed frame if the entrance is still in progress.
-    const animation = dialog.animate(
-      [{ transform: getComputedStyle(dialog).transform }, { transform: 'translateY(100%)' }],
-      {
-        duration: 380,
-        easing: 'cubic-bezier(0.22, 0.7, 0.25, 1)',
-        fill: 'forwards',
-      },
-    );
-    function cancel() {
-      if (pendingClose.current?.animation !== animation) return;
-      pendingClose.current = null;
-      preference.removeEventListener('change', reduce);
-      animation.onfinish = null;
-      animation.oncancel = null;
-      animation.cancel();
-      delete dialog!.dataset.state;
-    }
-    function finish() {
-      if (pendingClose.current?.animation !== animation) return;
-      // Native close restores focus after the complete panel has left the viewport.
-      dialog!.close();
-      cancel();
-    }
-    function reduce() {
-      if (preference.matches) finish();
-    }
-    pendingClose.current = { animation, cancel };
-    dialog.dataset.state = 'closing';
-    animation.onfinish = finish;
-    animation.oncancel = finish;
-    preference.addEventListener('change', reduce);
-  }
+  useSlideDialog(dialogRef, 'bottom');
+  const close = () => dialogRef.current?.close();
 
   return (
     <dialog
@@ -73,9 +29,6 @@ export default function FilterDialog({
       onCancel={(event) => {
         event.preventDefault();
         close();
-      }}
-      onClose={(event) => {
-        if (!event.currentTarget.open) pendingClose.current?.cancel();
       }}
       onClick={(event) => {
         if (event.target !== event.currentTarget) return;

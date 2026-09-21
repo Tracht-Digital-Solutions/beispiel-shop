@@ -1,3 +1,6 @@
+import * as m from 'motion/react-m';
+import { MotionRoot } from './Motion';
+import { useSlideDialog } from './useSlideDialog';
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { useStore } from '@nanostores/react';
 import type { Locale } from '../lib/types';
@@ -27,8 +30,8 @@ export function StorageNotice({ locale }: { locale: Locale }) {
           )
         : t(
             locale,
-            'Dein Browser blockiert den Warenkorbspeicher. Deine Auswahl bleibt nur auf dieser Seite erhalten und geht beim Neuladen oder Seitenwechsel verloren.',
-            'Your browser blocks bag storage. Your selection stays on this page only and is lost when you reload or change pages.',
+            'Dein Browser blockiert den Warenkorbspeicher. Deine Auswahl bleibt bis zum Neuladen in diesem Tab erhalten.',
+            'Your browser blocks bag storage. Your selection stays in this tab until you reload.',
           )}
     </p>
   ) : null;
@@ -43,7 +46,7 @@ function AnimatedCartRow({
   finish: (id: string, version: number) => void;
   children: ReactNode;
 }) {
-  const ref = useRef<HTMLLIElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const interruptedTransform = useRef<string | null>(null);
   const { phase, version, variant } = row;
   useLayoutEffect(() => {
@@ -71,16 +74,18 @@ function AnimatedCartRow({
     };
   }, [phase, version, variant.id, finish]);
   return (
-    <li
-      ref={ref}
-      className="commerce-cart-item"
-      data-state={phase}
-      data-variant-id={variant.id}
-      inert={phase === 'exit'}
-      aria-hidden={phase === 'exit' || undefined}
-    >
-      {children}
-    </li>
+    <m.li layout="position" style={{ listStyle: 'none', overflow: 'clip' }}>
+      <div
+        ref={ref}
+        className="commerce-cart-item"
+        data-state={phase}
+        data-variant-id={variant.id}
+        inert={phase !== 'idle'}
+        aria-hidden={phase === 'exit' || undefined}
+      >
+        {children}
+      </div>
+    </m.li>
   );
 }
 
@@ -112,96 +117,103 @@ function CartItems({ locale, close }: { locale: Locale; close?: () => void }) {
     removeItem(id);
   }
   return (
-    <div className="commerce-cart-content">
-      <ul
-        className="commerce-cart-items"
-        ref={listRef}
-        tabIndex={-1}
-        aria-label={t(locale, 'Artikel im Warenkorb', 'Bag items')}
-      >
-        {rows.map((row) => {
-          const { product, variant, quantity } = row;
-          return (
-            <AnimatedCartRow key={variant.id} row={row} finish={finish}>
-              <a className="commerce-cart-image" href={path(locale, `product/${product.slug}`)}>
-                <img src={product.image} alt={product.imageAlt[locale]} width="160" height="200" />
-              </a>
-              <div className="commerce-cart-item-info">
-                <div className="commerce-cart-item-top">
-                  <a href={path(locale, `product/${product.slug}`)}>{product.name}</a>
-                  <span>{money(product.price * quantity, locale)}</span>
-                </div>
-                <p>
-                  {variant.colorName[locale]} / {variant.size}
-                </p>
-                <div className="commerce-cart-item-bottom">
-                  <div className="commerce-quantity">
+    <MotionRoot>
+      <div className="commerce-cart-content">
+        <ul
+          className="commerce-cart-items"
+          ref={listRef}
+          tabIndex={-1}
+          aria-label={t(locale, 'Artikel im Warenkorb', 'Bag items')}
+        >
+          {rows.map((row) => {
+            const { product, variant, quantity } = row;
+            return (
+              <AnimatedCartRow key={variant.id} row={row} finish={finish}>
+                <a className="commerce-cart-image" href={path(locale, `product/${product.slug}`)}>
+                  <img
+                    src={product.image}
+                    alt={product.imageAlt[locale]}
+                    width="160"
+                    height="200"
+                  />
+                </a>
+                <div className="commerce-cart-item-info">
+                  <div className="commerce-cart-item-top">
+                    <a href={path(locale, `product/${product.slug}`)}>{product.name}</a>
+                    <span>{money(product.price * quantity, locale)}</span>
+                  </div>
+                  <p>
+                    {variant.colorName[locale]} / {variant.size}
+                  </p>
+                  <div className="commerce-cart-item-bottom">
+                    <div className="commerce-quantity">
+                      <button
+                        type="button"
+                        disabled={quantity <= 1}
+                        aria-label={t(
+                          locale,
+                          `Menge von ${product.name} verringern`,
+                          `Decrease quantity of ${product.name}`,
+                        )}
+                        onClick={() => setQuantity(variant.id, quantity - 1)}
+                      >
+                        −
+                      </button>
+                      <label className="commerce-sr-only" htmlFor={`${uid}-${variant.id}`}>
+                        {t(locale, `Menge für ${product.name}`, `Quantity for ${product.name}`)}
+                      </label>
+                      <input
+                        id={`${uid}-${variant.id}`}
+                        type="number"
+                        min="1"
+                        max={variant.stock}
+                        value={quantity}
+                        inputMode="numeric"
+                        onChange={(event) => {
+                          const value = Number(event.target.value);
+                          if (Number.isFinite(value) && value >= 1)
+                            setQuantity(variant.id, Math.min(variant.stock, Math.floor(value)));
+                        }}
+                      />
+                      <button
+                        type="button"
+                        disabled={quantity >= variant.stock}
+                        aria-label={t(
+                          locale,
+                          `Menge von ${product.name} erhöhen`,
+                          `Increase quantity of ${product.name}`,
+                        )}
+                        onClick={() => setQuantity(variant.id, quantity + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
                     <button
                       type="button"
-                      disabled={quantity <= 1}
-                      aria-label={t(
-                        locale,
-                        `Menge von ${product.name} verringern`,
-                        `Decrease quantity of ${product.name}`,
-                      )}
-                      onClick={() => setQuantity(variant.id, quantity - 1)}
+                      className="commerce-text-button"
+                      aria-label={t(locale, `${product.name} entfernen`, `Remove ${product.name}`)}
+                      onClick={() => remove(variant.id)}
                     >
-                      −
-                    </button>
-                    <label className="commerce-sr-only" htmlFor={`${uid}-${variant.id}`}>
-                      {t(locale, `Menge für ${product.name}`, `Quantity for ${product.name}`)}
-                    </label>
-                    <input
-                      id={`${uid}-${variant.id}`}
-                      type="number"
-                      min="1"
-                      max={variant.stock}
-                      value={quantity}
-                      inputMode="numeric"
-                      onChange={(event) => {
-                        const value = Number(event.target.value);
-                        if (Number.isFinite(value) && value >= 1)
-                          setQuantity(variant.id, Math.min(variant.stock, Math.floor(value)));
-                      }}
-                    />
-                    <button
-                      type="button"
-                      disabled={quantity >= variant.stock}
-                      aria-label={t(
-                        locale,
-                        `Menge von ${product.name} erhöhen`,
-                        `Increase quantity of ${product.name}`,
-                      )}
-                      onClick={() => setQuantity(variant.id, quantity + 1)}
-                    >
-                      +
+                      {t(locale, 'Entfernen', 'Remove')}
                     </button>
                   </div>
-                  <button
-                    type="button"
-                    className="commerce-text-button"
-                    aria-label={t(locale, `${product.name} entfernen`, `Remove ${product.name}`)}
-                    onClick={() => remove(variant.id)}
-                  >
-                    {t(locale, 'Entfernen', 'Remove')}
-                  </button>
+                  {quantity >= variant.stock && (
+                    <small className="commerce-stock-limit">
+                      {t(locale, 'Maximaler Demo-Bestand erreicht', 'Maximum demo stock reached')}
+                    </small>
+                  )}
                 </div>
-                {quantity >= variant.stock && (
-                  <small className="commerce-stock-limit">
-                    {t(locale, 'Maximaler Demo-Bestand erreicht', 'Maximum demo stock reached')}
-                  </small>
-                )}
-              </div>
-            </AnimatedCartRow>
-          );
-        })}
-      </ul>
-      {!rows.length && (
-        <div ref={emptyRef}>
-          <EmptyCart locale={locale} close={close} />
-        </div>
-      )}
-    </div>
+              </AnimatedCartRow>
+            );
+          })}
+        </ul>
+        {!rows.length && (
+          <div ref={emptyRef}>
+            <EmptyCart locale={locale} close={close} />
+          </div>
+        )}
+      </div>
+    </MotionRoot>
   );
 }
 
@@ -333,54 +345,18 @@ export function CartDrawer({ locale }: { locale: Locale }) {
   const items = useStore($cart, { ssr: 'initial' });
   const totals = cartTotals(items);
   const ref = useRef<HTMLDialogElement>(null);
-  const interruptedTransform = useRef<string | null>(null);
+  useSlideDialog(ref, 'right');
   const [visible, setVisible] = useState(false);
   const uid = useId();
   useEffect(() => {
     hydrateCart();
   }, []);
   useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
     if (open) {
       setVisible(true);
-      if (!dialog.open) {
-        interruptedTransform.current = null;
-        dialog.showModal();
-      } else if (interruptedTransform.current) {
-        const from = interruptedTransform.current;
-        interruptedTransform.current = null;
-        return slide(dialog, from, 'none', 280, () => {});
-      }
-      return;
-    }
-    if (dialog.open) {
-      const cancel = slide(
-        dialog,
-        getComputedStyle(dialog).transform,
-        'translateX(100%)',
-        380,
-        () => {
-          if (!$cartOpen.get()) {
-            dialog.close();
-            setVisible(false);
-          }
-        },
-      );
-      return () => {
-        if (dialog.open) interruptedTransform.current = getComputedStyle(dialog).transform;
-        cancel?.();
-      };
-    }
+      ref.current?.showModal();
+    } else ref.current?.close();
   }, [open]);
-  useEffect(() => {
-    if (!visible) return;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = overflow;
-    };
-  }, [visible]);
   const close = () => $cartOpen.set(false);
   return (
     <dialog

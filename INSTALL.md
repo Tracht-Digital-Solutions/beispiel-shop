@@ -71,7 +71,7 @@ Ohne Secret wird die Benachrichtigung übersprungen. Bei einem fehlgeschlagenen 
 
 ## Demodaten und Anpassungen
 
-Die Website verwendet ausschließlich Beispieldaten. Der Warenkorb wird lokal im Browser gespeichert. Ist dauerhafter Speicher blockiert, wird nach Möglichkeit der Sitzungsspeicher dieses Tabs verwendet. Sind beide Speicher blockiert, funktioniert die Auswahl im Arbeitsspeicher der aktuellen Seite; ein sichtbarer Hinweis erklärt den Verlust beim Seitenwechsel. Checkout und Kaufbestätigung sind simuliert; es gibt keine Verbindung zu einem Zahlungsdienst, Warenwirtschaftssystem oder Bestell-Backend. Das gilt für beide Sprachen und alle Buildkanäle.
+Die Website verwendet ausschließlich Beispieldaten. Der Warenkorb wird lokal im Browser gespeichert. Ist dauerhafter Speicher blockiert, wird nach Möglichkeit der Sitzungsspeicher dieses Tabs verwendet. Sind beide Speicher blockiert, bleibt die Auswahl bei internen Seiten- und Sprachwechseln im Arbeitsspeicher erhalten; ein sichtbarer Hinweis erklärt den Verlust beim Neuladen oder Verlassen des Tabs. Checkout und Kaufbestätigung sind simuliert; es gibt keine Verbindung zu einem Zahlungsdienst, Warenwirtschaftssystem oder Bestell-Backend. Das gilt für beide Sprachen und alle Buildkanäle.
 
 Ein echter Shop benötigt eine gesonderte Implementierung von Katalog-/Bestell-Backend, Zahlungen, Versand und den passenden Betreiberinformationen. Ein Release-Schalter aktiviert diese Funktionen nicht.
 

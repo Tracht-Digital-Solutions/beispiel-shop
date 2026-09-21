@@ -33,15 +33,15 @@ Die lokale Vorschau läuft unter [localhost:4321/de/](http://localhost:4321/de/)
 npm run type-check
 npm run test:run
 npm run build
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm run test:e2e
 ```
 
-Für Linux-Umgebungen installiert `npx playwright install --with-deps chromium` zusätzlich die Browser-Systembibliotheken. Die Tests verwenden die Playwright-Konfiguration des Projekts. Die aufgeführten Befehle sind die Prüfstrecke; der aktuelle Ergebnisstatus ist im jeweiligen [Actions-Lauf](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) sichtbar.
+Für Linux-Umgebungen installiert `npx playwright install --with-deps chromium firefox webkit` zusätzlich die Browser-Systembibliotheken. Die Tests verwenden die Playwright-Konfiguration des Projekts. Die aufgeführten Befehle sind die Prüfstrecke; der aktuelle Ergebnisstatus ist im jeweiligen [Actions-Lauf](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions) sichtbar.
 
 ## Technik und Übergabe
 
-Astro erzeugt statische HTML-Seiten. React übernimmt die interaktiven Shopfunktionen. TypeScript, Vitest und Playwright bilden die Prüfstrecke. Die fertige Website liegt nach dem Build in `dist/`; auf dem Webserver wird keine Node-Laufzeit benötigt.
+Astro erzeugt statische HTML-Seiten. React übernimmt die interaktiven Shopfunktionen. Motion steuert Seitenwechsel, Listen, Dialoge, Galerie und Scroll-Einstiege; Base UI stellt browserübergreifende Auswahlmenüs bereit. Bewegungsregeln und Primärquellen stehen in [docs/MOTION.md](docs/MOTION.md). TypeScript, Vitest und Playwright bilden die Prüfstrecke. Die fertige Website liegt nach dem Build in `dist/`; auf dem Webserver wird keine Node-Laufzeit benötigt.
 
 Die Pipelines folgen dem Muster der bestehenden TDS-Frontends:
 
