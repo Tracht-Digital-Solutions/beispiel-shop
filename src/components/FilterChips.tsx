@@ -28,6 +28,7 @@ export default function FilterChips({
               <button
                 type="button"
                 className={chip.id === 'reset' ? 'clear-filters' : undefined}
+                onPointerDown={(event) => event.preventDefault()}
                 onClick={() => {
                   searchRef.current?.focus({ preventScroll: true });
                   if (chip.id === 'reset') onReset();

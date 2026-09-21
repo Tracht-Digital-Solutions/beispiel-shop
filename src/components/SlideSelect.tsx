@@ -56,6 +56,20 @@ function SelectControl({
   const [popup, setPopup] = useState<HTMLDivElement | null>(null);
   const wasOpen = useRef(false);
   useLayoutEffect(() => {
+    if (!open) return;
+    // Escape also works during the popup's opening focus handoff.
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopPropagation();
+      setMoving(true);
+      setOpen(false);
+      trigger.current?.focus({ preventScroll: true });
+    };
+    document.addEventListener('keydown', closeOnEscape, true);
+    return () => document.removeEventListener('keydown', closeOnEscape, true);
+  }, [open]);
+  useLayoutEffect(() => {
     if (!popup) return;
     const from = wasOpen.current ? getComputedStyle(popup).transform : 'translateY(-105%)';
     wasOpen.current = open;

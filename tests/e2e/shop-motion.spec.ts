@@ -7,6 +7,7 @@ async function addTee(page: Page) {
   const drawer = page.locator('.commerce-cart-drawer');
   await expect(drawer).toBeVisible();
   await finishMotion(drawer);
+  await expect(drawer.locator('.commerce-cart-item')).toHaveAttribute('data-state', 'idle');
   return drawer;
 }
 
@@ -25,15 +26,26 @@ async function holdExit(button: Locator, ownerSelector: string, state: string) {
     async (element, { ownerSelector, state }) => {
       const owner = element.closest<HTMLElement>(ownerSelector);
       if (!owner) throw new Error(`Missing motion owner: ${ownerSelector}`);
+      const originalAnimate = owner.animate;
+      let captured = 0;
+      owner.animate = function (...args) {
+        const animation = originalAnimate.apply(this, args);
+        if (owner.dataset.state === state) {
+          animation.pause();
+          animation.currentTime = Number(animation.effect?.getTiming().duration) / 2;
+          captured++;
+        }
+        return animation;
+      };
       (element as HTMLButtonElement).click();
-      for (let frame = 0; frame < 10; frame++) {
+      for (let frame = 0; frame < 60; frame++) {
         await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-        const motions = owner.getAnimations().filter((motion) => motion.playState === 'running');
-        if (owner.dataset.state === state && motions.length) {
-          motions.forEach((motion) => motion.pause());
-          return motions.length;
+        if (captured) {
+          owner.animate = originalAnimate;
+          return captured;
         }
       }
+      owner.animate = originalAnimate;
       return 0;
     },
     { ownerSelector, state },
