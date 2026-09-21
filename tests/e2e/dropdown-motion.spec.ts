@@ -12,6 +12,10 @@ for (const locale of ['de', 'en'])
       await trigger.click();
       await expectSlide(page, 'y');
       await page.keyboard.press('m');
+      await expect(page.locator('.slide-select-option[data-value="M"]')).toHaveAttribute(
+        'data-highlighted',
+        '',
+      );
       await page.keyboard.press('Enter');
       await expect(trigger).toContainText('M');
       await expect(page).toHaveURL(/size=M/);

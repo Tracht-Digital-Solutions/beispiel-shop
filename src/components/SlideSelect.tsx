@@ -97,6 +97,7 @@ function SelectControl({
         setOpen(next);
       }}
       actionsRef={actions}
+      highlightItemOnHover={false}
       modal={false}
       name={name}
       autoComplete={autoComplete}

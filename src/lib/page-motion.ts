@@ -13,7 +13,11 @@ document.addEventListener(
   (event) => {
     if (event.button !== 0) return;
     const button = (event.target as Element)?.closest<HTMLButtonElement>('button');
-    if (button && !button.disabled && !button.closest('[inert], .filter-chip-slot'))
+    if (
+      button &&
+      !button.disabled &&
+      !button.closest('[inert], .filter-chip-slot, .slide-select-trigger')
+    )
       button.focus({ preventScroll: true });
   },
   true,
