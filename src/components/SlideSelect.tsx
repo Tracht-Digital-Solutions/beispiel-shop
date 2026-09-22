@@ -48,6 +48,7 @@ function SelectControl({
 }: Props) {
   const items = options(children);
   const [open, setOpen] = useState(false);
+  const requestedOpen = useRef(false);
   const [moving, setMoving] = useState(false);
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -56,19 +57,18 @@ function SelectControl({
   const [popup, setPopup] = useState<HTMLDivElement | null>(null);
   const wasOpen = useRef(false);
   useLayoutEffect(() => {
-    if (!open) return;
     // Escape also works during the popup's opening focus handoff.
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
+      if (event.key !== 'Escape' || !requestedOpen.current) return;
       event.preventDefault();
-      event.stopPropagation();
+      event.stopImmediatePropagation();
+      requestedOpen.current = false;
       setMoving(true);
       setOpen(false);
-      trigger.current?.focus({ preventScroll: true });
     };
     document.addEventListener('keydown', closeOnEscape, true);
     return () => document.removeEventListener('keydown', closeOnEscape, true);
-  }, [open]);
+  }, []);
   useLayoutEffect(() => {
     if (!popup) return;
     const from = wasOpen.current ? getComputedStyle(popup).transform : 'translateY(-105%)';
@@ -92,6 +92,7 @@ function SelectControl({
       onValueChange={(next) => onChange?.({ target: { value: next ?? '' } })}
       open={open}
       onOpenChange={(next) => {
+        requestedOpen.current = next;
         setContainer(trigger.current?.closest('dialog') ?? document.body);
         setMoving(true);
         setOpen(next);
@@ -122,6 +123,7 @@ function SelectControl({
         >
           <Select.Popup
             ref={setPopup}
+            finalFocus={trigger}
             className="slide-select-popup"
             data-moving={moving}
             inert={!open}
