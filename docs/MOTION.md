@@ -1,6 +1,6 @@
 # Bewegungsdesign mit Motion
 
-Stand: 21. September 2026. Alle Übergänge sind gerichtete Slides mit unveränderter Deckkraft. Keine Federn, kein Nachschwingen und keine animierten Button-Impulse.
+Stand: 22. September 2026. Alle Übergänge sind gerichtete Slides mit unveränderter Deckkraft. Keine Federn, kein Nachschwingen und keine animierten Button-Impulse.
 
 ## Gemeinsame Regeln
 
@@ -39,3 +39,5 @@ Primärquellen, konsultiert am 20. September 2026:
 - [Astro: View transitions](https://docs.astro.build/en/guides/view-transitions/): ClientRouter-Lebenszyklus für Laden, Austausch, Verlauf und Skripte.
 
 Prüfergebnisse und Grenzen der Labormessungen stehen in [VALIDATION.md](VALIDATION.md).
+
+Automatische Scroll- und Fokuskorrekturen erfolgen unmittelbar. Globales CSS-Smooth-Scrolling ist deaktiviert, damit Browser keine Bedienelemente während eines Klicks verschieben. Die ausdrücklich gestalteten Slide-Übergänge bleiben davon unabhängig.

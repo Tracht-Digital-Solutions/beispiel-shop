@@ -1,6 +1,6 @@
 # Prüfung und Abnahme
 
-Stand: 21. September 2026. Produktionsbuild unter Windows mit Node.js 24, Chromium 153, Firefox 155 und WebKit 26.6. GitHub Actions prüft zusätzlich unter Ubuntu; aktuelle Ergebnisse stehen unter [Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions).
+Stand: 22. September 2026. Produktionsbuild unter Windows mit Node.js 24, Chromium 153, Firefox 155 und WebKit 26.6. GitHub Actions prüft zusätzlich unter Ubuntu; aktuelle Ergebnisse stehen unter [Actions](https://github.com/Tracht-Digital-Solutions/beispiel-shop/actions).
 
 ## Ergebnis
 
@@ -8,14 +8,14 @@ Stand: 21. September 2026. Produktionsbuild unter Windows mit Node.js 24, Chromi
 | --- | --- |
 | Astro / TypeScript | 57 Dateien, 0 Fehler, 0 Warnungen |
 | Vitest | 34 Tests bestanden |
-| Playwright | 187 direkt bestanden, 1 im Wiederholungslauf bestanden, 4 bewusst übersprungen |
+| Playwright | 188 bestanden, 4 bewusst übersprungen |
 | Statischer Build | 46 Seiten |
 | Formatprüfung | Bestanden |
 | axe auf geprüften Seiten und Dialogen | Keine erkannten Verstöße in den ausgewählten WCAG-A-/AA-Regeln |
 
 Vier Browserprojekte prüfen Desktop-Chromium, Pixel-7-Emulation, Firefox und WebKit. Der Touch-Test läuft nur im mobilen Projekt (drei übersprungene Desktop-Fälle); die zusätzliche 320-/834-Pixel-Prüfung wird im mobilen Projekt nicht doppelt ausgeführt. Emulation ersetzt keine Prüfung auf physischen Geräten.
 
-Der vollständige lokale Lauf umfasst jetzt 192 Fälle. Ein vorhandener Firefox-Sortiertest schlug einmal fehl; der anschließende dreifache Lauf der betroffenen Testdatei bestand mit 9/9 Fällen. Die GitHub-Pipelines prüfen den finalen Quellstand erneut.
+Der vollständige lokale Abschlusslauf umfasst 192 Fälle und bestand ohne Wiederholung. Globales weiches Scrollen wurde entfernt: automatische Fokus- und Scrollkorrekturen dürfen Bedienelemente nicht zwischen Mausdruck und Klick verschieben. Beim Entfernen von Warenkorbartikeln wird der Fokus ohne Scrollsprung weitergegeben. Die GitHub-Pipelines prüfen den finalen Quellstand erneut.
 
 ## Lückenloser Seitenwechsel
 

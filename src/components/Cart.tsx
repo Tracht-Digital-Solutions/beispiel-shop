@@ -112,7 +112,7 @@ function CartItems({ locale, close }: { locale: Locale; close?: () => void }) {
         list.querySelector<HTMLButtonElement>(
           `[data-variant-id="${next.variant.id}"] .commerce-text-button`,
         );
-      (target || list).focus();
+      (target || list).focus({ preventScroll: true });
     }
     removeItem(id);
   }
