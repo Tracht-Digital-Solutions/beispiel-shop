@@ -21,6 +21,10 @@ for (const locale of ['de', 'en'])
       await expect(page).toHaveURL(/size=M/);
       await expect(page.locator('.slide-select-popup')).not.toBeVisible();
       await trigger.click();
+      // WebKit can finish the pointer action before React commits the reopened
+      // popup. Send Escape once the control is open, including during its slide.
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      await expect(page.locator('.slide-select-popup')).toBeVisible();
       if (isMobile)
         expect(
           await page
