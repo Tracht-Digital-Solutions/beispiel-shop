@@ -60,3 +60,14 @@ Die dokumentierten Prüfergebnisse stehen in [docs/VALIDATION.md](docs/VALIDATIO
 ## English
 
 BLOCK/01 is a fictional, bilingual streetwear shop built as a frontend portfolio sample by Tracht Digital Solutions. Browse the English shop at `/en/`. Checkout is simulated: no payments, real orders or deliveries. Run `npm ci` and `npm run dev` with Node.js 24. The production build is static and requires no application server.
+
+## Lizenz / License
+
+**Öffentlich einsehbar, alle Rechte vorbehalten.** Der Code kann gelesen und
+zur Beurteilung der Programmierkenntnisse betrachtet werden. Es besteht keine
+allgemeine Erlaubnis zum Kopieren, Verändern oder kommerziellen Weiterverwenden.
+Die vollständigen Bedingungen und Ausnahmen stehen in [LICENSE](LICENSE).
+
+**Publicly viewable, all rights reserved.** Public access permits inspection of
+the code, but grants no general permission to copy, modify or commercially reuse
+it. See [LICENSE](LICENSE) for the complete terms and exceptions.
