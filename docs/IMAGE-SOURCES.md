@@ -48,4 +48,4 @@ Es wurden ausschließlich Drehung anhand der Orientierung, proportionale Verklei
 
 ## Verwendetes Prompt-Set
 
-Die Prompts liegen nicht im Repository, sondern im Workspace unter `stuff/03-Materialien/Demoseiten-Bildprompts/beispiel-shop/PROMPTS.md`.
+Die Prompts liegen nicht im Repository, sondern im Workspace unter `stuff/03-Bilder/Demoseiten-2026-11/beispiel-shop/PROMPTS.md`.
